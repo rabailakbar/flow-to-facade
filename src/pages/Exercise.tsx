@@ -9,7 +9,7 @@ const Exercise = () => {
   const moduleId = searchParams.get("id") || "M1";
   const moduleName = searchParams.get("name") || "Pick & Flick";
 
-  const [selectedCount, setSelectedCount] = useState(0);
+  const [selectedCount, setSelectedCount] = useState(15);
   const [currentStep, setCurrentStep] = useState<"exercise" | "result1" | "result2" | "result3" | "complete">("exercise");
 
   const allTopics = [
