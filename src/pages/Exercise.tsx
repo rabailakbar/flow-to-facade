@@ -35,16 +35,26 @@ const Exercise = () => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   const handleCardClick = (id: number, name: string) => {
+    const newCount = selectedCount + 1;
+    console.log('Card clicked:', name, 'New count:', newCount);
+    
     setSelectedTopics(prev => [...prev, name]);
+    setSelectedCount(newCount);
     
     // Remove the clicked card
     setTopics(prev => prev.filter(t => t.id !== id));
-    
-    const newCount = selectedCount + 1;
-    setSelectedCount(newCount);
+
+    // Move to results after 15 selections
+    if (newCount >= 15) {
+      console.log('Reached 15! Moving to result1');
+      setTimeout(() => {
+        setCurrentStep("result1");
+      }, 1000);
+      return; // Don't add new cards
+    }
 
     // Add a new card if we have more topics and haven't reached 15
-    if (nextTopicIndex < allTopics.length && newCount < 15) {
+    if (nextTopicIndex < allTopics.length) {
       setTimeout(() => {
         setTopics(prev => [...prev, {
           id: nextTopicIndex,
@@ -53,13 +63,6 @@ const Exercise = () => {
         }]);
         setNextTopicIndex(prev => prev + 1);
       }, 300);
-    }
-
-    // Move to results after 15 selections
-    if (newCount === 15) {
-      setTimeout(() => {
-        setCurrentStep("result1");
-      }, 1000);
     }
   };
 
