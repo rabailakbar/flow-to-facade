@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Code, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}
@@ -97,7 +99,10 @@ const Dashboard = () => {
 
       {/* Module Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card className="p-4">
+        <Card 
+          className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => navigate("/module?id=M1&name=Pick & Flick&phase=Phase i")}
+        >
           <div className="aspect-square bg-muted rounded-md mb-3" />
           <h4 className="font-semibold text-sm mb-2">Pick & flick</h4>
           <p className="text-xs text-muted-foreground mb-2">
@@ -109,7 +114,11 @@ const Dashboard = () => {
         </Card>
 
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-4">
+          <Card 
+            key={i} 
+            className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => navigate(`/module?id=M${i+1}&name=Let's blow bubbles&phase=Phase ii`)}
+          >
             <div className="aspect-square bg-muted rounded-md mb-3" />
             <h4 className="font-semibold text-sm mb-2">Let's blow bubbles</h4>
             <p className="text-xs text-muted-foreground mb-2">
