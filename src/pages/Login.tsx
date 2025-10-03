@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen">
       {/* Left side - decorative area */}
@@ -36,6 +38,7 @@ const Login = () => {
           <Button 
             className="w-full"
             size="lg"
+            onClick={() => navigate("/dashboard")}
           >
             Login
           </Button>
