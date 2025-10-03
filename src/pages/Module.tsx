@@ -83,7 +83,11 @@ const Module = () => {
             </div>
 
             {/* Start Button */}
-            <Button className="w-full" size="lg">
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={() => navigate(`/exercise?id=${moduleId}&name=${moduleName}`)}
+            >
               Click here to start
             </Button>
           </div>
