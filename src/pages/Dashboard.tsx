@@ -1,9 +1,44 @@
 import { Card } from "@/components/ui/card";
 import { Code, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import supabase  from "@/utils/supabase";
+import { useState,useEffect } from "react";
 const Dashboard = () => {
+
+  const BUCKET_NAME = 'Thesis'; 
+const FOLDER_NAME = 'Modules'; 
+
+
+useEffect(()=>{
+fetchImages()
+},[])
   const navigate = useNavigate();
+  const [imageUrls, setImageUrls] = useState([]);
+
+  const fetchImages = async () => {
+    // List files from the 'module' folder
+    console.log("checking supabase",supabase.storage)
+    
+    const { data, error } = await supabase.storage
+          .from(BUCKET_NAME)
+          .list('',{ limit: 100, }); 
+  
+console.log("Files:", data);
+    // if (error) {
+    //   console.error('Error listing images:', error.message);
+    //   return;
+    // }
+
+//     // Generate public URLs for each file
+     const urls = data.map((file) => {
+       const url = supabase.storage.from(BUCKET_NAME).getPublicUrl(`${FOLDER_NAME}/${file.name}`);
+       return url;
+     });
+ console.log("image url",urls)
+     setImageUrls(urls);
+  };
+
+
   return (
     <div className="min-h-screen bg-background p-6">
       {/* Header */}

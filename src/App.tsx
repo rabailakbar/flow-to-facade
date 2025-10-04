@@ -10,9 +10,16 @@ import Module from "./pages/Module";
 import Exercise from "./pages/Exercise";
 import NotFound from "./pages/NotFound";
 
+
+
+
+
 const queryClient = new QueryClient();
 
 const App = () => (
+
+
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
