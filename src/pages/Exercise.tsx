@@ -259,29 +259,6 @@ const Exercise = () => {
               gridAutoFlow: 'dense'
             }}
           >
-            {posts.map((post) => (
-              <div
-                key={post.id}
-                style={{
-                  width: `${post.width}px`,
-                  height: `${post.displayHeight}px`
-                }}
-                className="overflow-hidden rounded-lg"
-              >
-                {post.imageUrl && (
-                  <img 
-                    src={post.imageUrl} 
-                    alt={post.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                      display: 'block'
-                    }}
-                  />
-                )}
-              </div>
-            ))}
           </div>
         </div>
       </div>
