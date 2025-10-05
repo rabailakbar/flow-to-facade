@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Clock, ThumbsUp, ThumbsDown, Heart, Bookmark, MessageCircle } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Topic {
   id: number;
@@ -22,6 +23,7 @@ interface Post {
   saved: boolean;
   commented: boolean;
   height: "short" | "medium" | "tall";
+  imageUrl?: string;
 }
 
 const Exercise = () => {
@@ -31,6 +33,42 @@ const Exercise = () => {
   const moduleName = searchParams.get("name") || "Pick & Flick";
   
   const [isComplete, setIsComplete] = useState(false);
+  
+  // Fetch images from Supabase storage
+  useEffect(() => {
+    const fetchImages = async () => {
+      const { data, error } = await supabase.storage
+        .from('Thesis')
+        .list('Modules', {
+          limit: 100,
+          offset: 0,
+        });
+
+      if (error) {
+        console.error('Error fetching images:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const imageUrls = data.map(file => {
+          const { data: urlData } = supabase.storage
+            .from('Thesis')
+            .getPublicUrl(`Modules/${file.name}`);
+          return urlData.publicUrl;
+        });
+
+        // Update posts with actual image URLs
+        setPosts(prev => prev.map((post, index) => ({
+          ...post,
+          imageUrl: imageUrls[index % imageUrls.length] // Cycle through available images
+        })));
+      }
+    };
+
+    if (moduleId === "M2") {
+      fetchImages();
+    }
+  }, [moduleId]);
   
   // Module 1 state
   const [topics, setTopics] = useState<Topic[]>([
@@ -176,7 +214,15 @@ const Exercise = () => {
               
               return (
                 <Card key={post.id} className="mb-4 break-inside-avoid overflow-hidden">
-                  <div className={`${heightClass} bg-muted`} />
+                  <div className={`${heightClass} bg-muted relative overflow-hidden`}>
+                    {post.imageUrl && (
+                      <img 
+                        src={post.imageUrl} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
                   <div className="p-4">
                     <p className="text-xs text-muted-foreground mb-2">{post.source}</p>
                     <h3 className="text-sm font-semibold mb-3 line-clamp-3">{post.title}</h3>
