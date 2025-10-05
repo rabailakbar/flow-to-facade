@@ -22,9 +22,10 @@ interface Post {
   liked: boolean;
   saved: boolean;
   commented: boolean;
-  height: "short" | "medium" | "tall";
   imageUrl?: string;
-  imageHeight?: number;
+  width: number;
+  displayHeight: number;
+  type: "YTH" | "IG" | "YTT" | "IGR" | "TTR";
 }
 
 const Exercise = () => {
@@ -51,41 +52,57 @@ const Exercise = () => {
       }
 
       if (data && data.length > 0) {
-        // Get public URLs for all images
-        const imageData = data.map(file => {
+        // Map images based on filename and type
+        const mappedPosts = data.map((file, index) => {
           const { data: urlData } = supabase.storage
             .from('Thesis')
             .getPublicUrl(`Modules/${file.name}`);
-          return urlData.publicUrl;
+          
+          const fileName = file.name.toLowerCase();
+          let type: "YTH" | "IG" | "YTT" | "IGR" | "TTR" = "IG";
+          let width = 226;
+          let height = 360;
+          
+          // Determine type and dimensions based on filename
+          if (fileName.includes('yth') || fileName.includes('yt headline')) {
+            type = "YTH";
+            width = 494;
+            height = 130;
+          } else if (fileName.includes('youtube thumbnail') || fileName.includes('ytt')) {
+            type = "YTT";
+            width = 494;
+            height = 297;
+          } else if (fileName.includes('igr')) {
+            type = "IGR";
+            width = 226;
+            height = 406;
+          } else if (fileName.includes('tt_') || fileName.includes('ttr')) {
+            type = "TTR";
+            width = 226;
+            height = 406;
+          } else if (fileName.includes('ig')) {
+            type = "IG";
+            width = 226;
+            height = 360;
+          }
+          
+          return {
+            id: index + 1,
+            title: file.name,
+            source: "",
+            views: "",
+            timeAgo: "",
+            liked: false,
+            saved: false,
+            commented: false,
+            imageUrl: urlData.publicUrl,
+            width,
+            displayHeight: height,
+            type
+          };
         });
-
-        // Load images to get their dimensions
-        const loadImageDimensions = (url: string): Promise<{ url: string; height: number }> => {
-          return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-              // Calculate height based on aspect ratio (width will be constrained by column)
-              // Assuming column width is around 300px, calculate proportional height
-              const aspectRatio = img.height / img.width;
-              const estimatedHeight = Math.round(aspectRatio * 300);
-              resolve({ url, height: estimatedHeight });
-            };
-            img.onerror = () => {
-              // Default to medium height if image fails to load
-              resolve({ url, height: 250 });
-            };
-            img.src = url;
-          });
-        };
-
-        // Load all images and get their dimensions
-        Promise.all(imageData.map(loadImageDimensions)).then(imageDimensions => {
-          setPosts(prev => prev.map((post, index) => ({
-            ...post,
-            imageUrl: imageDimensions[index % imageDimensions.length].url,
-            imageHeight: imageDimensions[index % imageDimensions.length].height
-          })));
-        });
+        
+        setPosts(mappedPosts);
       }
     };
 
@@ -108,18 +125,7 @@ const Exercise = () => {
   ]);
 
   // Module 2 state
-  const [posts, setPosts] = useState<Post[]>([
-    { id: 1, title: "Blake Lively, Justin Baldoni and the collapse of Hollywood #MeToo Era", source: "dawn_images", views: "1.2K", timeAgo: "9 hours ago", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 2, title: "How many times can they be 'lucky guesses' before it's just the truth hiding in plain sight? #SimpsonsConspiracy", source: "EntertainMentWeekLY133", views: "1.5K", timeAgo: "1 day ago", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 3, title: "Bill Gates Knew It All Along? The Pandemic Prediction That Made Him Millions", source: "healthsafety67", views: "90.1M", timeAgo: "356 weeks ago", liked: false, saved: false, commented: false, height: "short" },
-    { id: 4, title: "HERE'S A BREAKDOWN OF ALL PREDICTIONS MADE BY THE SIMPSONS FOR 2025", source: "Shobby Entertainment", views: "1.9M", timeAgo: "157K", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 5, title: "AI Just Stole Studio Ghibli's Soul?! Artists Furious Over ChatGPT Ghibli Trend", source: "Eazy Explained", views: "1M", timeAgo: "14 weeks ago", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 6, title: "Ryan Gosling speaks out after Oscars snub leaves Barbie f*cking furious", source: "dawn_images", views: "2.5K", timeAgo: "2 days ago", liked: false, saved: false, commented: false, height: "short" },
-    { id: 7, title: "The black hole 'Gargantua' was so scientifically accurate, it took astrophysicists 100 hours for a single render. NASA Scientists even published research.", source: "abcnews", views: "856K", timeAgo: "5 days ago", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 8, title: "BOMBSHELL: Mortician EXPOSES Charlie Kirk's Autopsy - The Key Evidence EVERYONE Missed!", source: "Beyond", views: "357K", timeAgo: "5 days ago", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 9, title: "The AI Safety Expert: These are the only 5 Jobs that will remain in 2030! - Dr. Roman Yampolskiy", source: "The Diary of a CEO", views: "2.3M", timeAgo: "2 weeks ago", liked: false, saved: false, commented: false, height: "short" },
-    { id: 10, title: "25 Best Ghibli Studio Images that are taking over the internet right now!", source: "ArtLeaks Online", views: "450K", timeAgo: "1 week ago", liked: false, saved: false, commented: false, height: "medium" },
-  ]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   const selectedCount = topics.filter(t => t.voted === "interested").length;
   const likesCount = posts.filter(p => p.liked).length;
@@ -229,25 +235,33 @@ const Exercise = () => {
           <h2 className="text-xl mb-8">Click to like, save & comment</h2>
 
           {/* Posts Masonry Grid */}
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
-          {posts.map((post) => {              
-              return (
-                <Card key={post.id} className="mb-4 break-inside-avoid overflow-hidden">
-                  <div 
-                    className="bg-muted relative overflow-hidden"
-                    style={{ height: post.imageHeight ? `${post.imageHeight}px` : '250px' }}
-                  >
-                    {post.imageUrl && (
-                      <img 
-                        src={post.imageUrl} 
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                </Card>
-              );
-            })}
+          <div 
+            className="grid"
+            style={{
+              gridTemplateColumns: 'repeat(auto-fill, 226px)',
+              gap: '19px',
+              justifyContent: 'start'
+            }}
+          >
+            {posts.map((post) => (
+              <div
+                key={post.id}
+                style={{
+                  width: `${post.width}px`,
+                  height: `${post.displayHeight}px`,
+                  gridColumn: post.width === 494 ? 'span 2' : 'span 1'
+                }}
+                className="overflow-hidden rounded-lg"
+              >
+                {post.imageUrl && (
+                  <img 
+                    src={post.imageUrl} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
