@@ -99,14 +99,17 @@ console.log("Files:", data);
           <h3 className="font-semibold mb-4 text-center">Phase ii</h3>
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-2">
+              <div 
+                className="p-3 bg-muted rounded border-2 border-dashed border-border text-center text-sm font-medium cursor-pointer hover:bg-accent transition-colors"
+                onClick={() => navigate("/module?id=M3&name=Fake or Fact?&phase=Phase II")}
+              >
+                M3
+              </div>
               <div className="p-3 bg-muted rounded border-2 border-dashed border-border text-center text-sm font-medium">
                 M4
               </div>
               <div className="p-3 bg-muted rounded border-2 border-dashed border-border text-center text-sm font-medium">
                 M5
-              </div>
-              <div className="p-3 bg-muted rounded border-2 border-dashed border-border text-center text-sm font-medium">
-                M6
               </div>
             </div>
             <div className="p-2 bg-muted rounded text-xs text-center text-muted-foreground">
@@ -155,22 +158,32 @@ console.log("Files:", data);
           </div>
         </Card>
 
-        {[1, 2, 3, 4].map((i) => (
-          <Card 
-            key={i} 
-            className="p-4 cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => navigate(`/module?id=M${i+1}&name=Let's blow bubbles&phase=Phase ii`)}
-          >
-            <div className="aspect-square bg-muted rounded-md mb-3" />
-            <h4 className="font-semibold text-sm mb-2">Let's blow bubbles</h4>
-            <p className="text-xs text-muted-foreground mb-2">
-              Let's help you build your newsfeed
-            </p>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <span>📄 10 exercises</span>
-            </div>
-          </Card>
-        ))}
+        {[1, 2, 3, 4].map((i) => {
+          const moduleNumber = i + 1;
+          const isModule3 = moduleNumber === 3;
+          const moduleName = isModule3 ? "Fake or Fact?" : "Let's blow bubbles";
+          const moduleDesc = isModule3 
+            ? "Is everything around us real or fake?" 
+            : "Let's help you build your newsfeed";
+          const phase = isModule3 ? "Phase II" : "Phase ii";
+          
+          return (
+            <Card 
+              key={i} 
+              className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/module?id=M${moduleNumber}&name=${moduleName}&phase=${phase}`)}
+            >
+              <div className="aspect-square bg-muted rounded-md mb-3" />
+              <h4 className="font-semibold text-sm mb-2">{moduleName}</h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                {moduleDesc}
+              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span>📄 10 exercises</span>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
