@@ -66,7 +66,10 @@ console.log("Files:", data);
             </p>
           </div>
         </div>
-        <Button className="absolute bottom-4 right-4">
+        <Button 
+          className="absolute bottom-4 right-4"
+          onClick={() => navigate("/module?id=M1&name=Pick & Flick&phase=Phase i")}
+        >
           Click here to start
         </Button>
       </Card>
