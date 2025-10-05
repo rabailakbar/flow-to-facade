@@ -274,101 +274,101 @@ const Exercise = () => {
             }}
           >
             {/* Shape 1 */}
-            <div style={{ width: '226px', height: '261px', gridColumn: '1', gridRow: '1' }}>
+            <div style={{ width: '226px', height: '261px', gridColumn: '1', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[0].fileName}`}
                 alt="Shape 1"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 2 */}
-            <div style={{ width: '226px', height: '406px', gridColumn: '1', gridRow: '2 / 4' }}>
+            <div style={{ width: '226px', height: '406px', gridColumn: '1', gridRow: '2 / 4', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[1].fileName}`}
                 alt="Shape 2"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 3 */}
-            <div style={{ width: '494px', height: '135px', gridColumn: '2 / 3', gridRow: '1' }}>
+            <div style={{ width: '494px', height: '135px', gridColumn: '2 / 3', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
                 alt="Shape 3"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 4 */}
-            <div style={{ width: '494px', height: '258px', gridColumn: '2 / 3', gridRow: '2', marginTop: '-10px' }}>
+            <div style={{ width: '494px', height: '258px', gridColumn: '2 / 3', gridRow: '2', marginTop: '-10px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
                 alt="Shape 4"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 5 */}
-            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3' }}>
+            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
                 alt="Shape 5"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 6 */}
-            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3', marginLeft: '254px' }}>
+            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3', marginLeft: '254px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
                 alt="Shape 6"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 7 */}
-            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '1' }}>
+            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[6].fileName}`}
                 alt="Shape 7"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 8 */}
-            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '2' }}>
+            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '2', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[7].fileName}`}
                 alt="Shape 8"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 9 */}
-            <div style={{ width: '494px', height: '135px', gridColumn: '3', gridRow: '3' }}>
+            <div style={{ width: '494px', height: '135px', gridColumn: '3', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[8].fileName}`}
                 alt="Shape 9"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 10 */}
-            <div style={{ width: '226px', height: '406px', gridColumn: '4', gridRow: '1 / 3' }}>
+            <div style={{ width: '226px', height: '406px', gridColumn: '4', gridRow: '1 / 3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[9].fileName}`}
                 alt="Shape 10"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
 
             {/* Shape 11 */}
-            <div style={{ width: '226px', height: '261px', gridColumn: '4', gridRow: '3' }}>
+            <div style={{ width: '226px', height: '261px', gridColumn: '4', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[10].fileName}`}
                 alt="Shape 11"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
           </div>
