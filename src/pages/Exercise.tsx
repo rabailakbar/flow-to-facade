@@ -364,7 +364,7 @@ const Exercise = () => {
                       className="transition-colors duration-200 hover:scale-110"
                     >
                       <Heart 
-                        className={`w-4 h-4 ${post.liked ? 'fill-red-500 text-red-500' : 'text-foreground'}`}
+                        className={`w-5 h-5 ${post.liked ? 'fill-red-500 text-red-500' : 'text-foreground'}`}
                       />
                     </button>
                     <button
@@ -372,7 +372,7 @@ const Exercise = () => {
                       className="transition-colors duration-200 hover:scale-110"
                     >
                       <Bookmark 
-                        className={`w-4 h-4 ${post.saved ? 'fill-primary text-primary' : 'text-foreground'}`}
+                        className={`w-5 h-5 ${post.saved ? 'fill-primary text-primary' : 'text-foreground'}`}
                       />
                     </button>
                   </div>
