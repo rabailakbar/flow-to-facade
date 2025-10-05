@@ -310,7 +310,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 5 */}
-            <div style={{ width: '226px', height: '356px', gridColumn: '2', gridRow: '3', borderRadius: '10px',marginTop: '-100px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '226px', height: '356px', gridColumn: '2', gridRow: '3', borderRadius: '10px',marginTop: '-110px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
                 alt="Shape 5"
@@ -319,7 +319,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 6 */}
-            <div style={{ width: '251px', height: '399px', gridColumn: '2', gridRow: '3', marginLeft: '254px',marginTop: '-100px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '251px', height: '399px', gridColumn: '2', gridRow: '3', marginLeft: '254px',marginTop: '-110px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
                 alt="Shape 6"
