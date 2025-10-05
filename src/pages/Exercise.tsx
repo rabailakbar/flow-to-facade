@@ -269,7 +269,7 @@ const Exercise = () => {
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '20px',
+              gap: '19px',
               gridAutoRows: 'min-content'
             }}
           >
