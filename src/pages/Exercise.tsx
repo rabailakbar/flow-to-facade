@@ -145,14 +145,14 @@ const Exercise = () => {
     { id: 1, fileName: "IG Post_1c.png", width: 226, height: 361 },
     { id: 2, fileName: "IGR_3c.png", width: 224, height: 402 },
     { id: 3, fileName: "YT Headline_ 8b.png", width: 493, height: 130 },
-    { id: 4, fileName: "YouTube Thumbnail_ 4a.png", width: 496, height: 284 },
+    { id: 4, fileName: "YouTube Thumbnail_ 4a.png", width: 496, height: 248 },
     { id: 5, fileName: "IG_9b.png", width: 226, height: 356 },
     { id: 6, fileName: "IG_10a.png", width: 251, height: 399 },
     { id: 7, fileName: "YTT_6b.png", width: 494, height: 247 },
     { id: 8, fileName: "YTT_7a.png", width: 494, height: 247 },
     { id: 9, fileName: "YTH_R.png", width: 494, height: 130 },
     { id: 10, fileName: "IGR_8e.png", width: 228, height: 409 },
-    { id: 11, fileName: "IG_4c.png", width: 227, height: 393 },
+    { id: 11, fileName: "IG_4c.png", width: 227, height: 363 },
   ];
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -301,7 +301,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 4 */}
-            <div style={{ width: '496px', height: '284px', gridColumn: '2 / 3', gridRow: '2', marginTop: '-10px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '496px', height: '248px', gridColumn: '2 / 3', gridRow: '2', marginTop: '-10px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
                 alt="Shape 4"
@@ -364,7 +364,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 11 */}
-            <div style={{ width: '227px', height: '393px', gridColumn: '4', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '227px', height: '363px', gridColumn: '4', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[10].fileName}`}
                 alt="Shape 11"
