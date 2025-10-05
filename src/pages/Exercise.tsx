@@ -357,11 +357,11 @@ const Exercise = () => {
                   
                   {/* Overlay with buttons */}
                   <div 
-                    className="absolute bottom-0 left-0 right-0 h-6 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3"
+                    className="absolute bottom-0 left-0 right-0 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3 px-2"
                   >
                     <button
                       onClick={() => handlePostAction(item.id, 'like')}
-                      className="transition-colors duration-200 hover:scale-110"
+                      className="flex items-center justify-center bg-background/90 backdrop-blur-sm border border-border rounded-full px-6 py-1 transition-all duration-200 hover:scale-105"
                     >
                       <Heart 
                         className={`w-5 h-5 ${post.liked ? 'fill-red-500 text-red-500' : 'text-foreground'}`}
@@ -369,7 +369,7 @@ const Exercise = () => {
                     </button>
                     <button
                       onClick={() => handlePostAction(item.id, 'save')}
-                      className="transition-colors duration-200 hover:scale-110"
+                      className="flex items-center justify-center bg-background/90 backdrop-blur-sm border border-border rounded-full px-6 py-1 transition-all duration-200 hover:scale-105"
                     >
                       <Bookmark 
                         className={`w-5 h-5 ${post.saved ? 'fill-primary text-primary' : 'text-foreground'}`}
