@@ -245,39 +245,6 @@ const Exercise = () => {
                       />
                     )}
                   </div>
-                  <div className="p-4">
-                    <p className="text-xs text-muted-foreground mb-2">{post.source}</p>
-                    <h3 className="text-sm font-semibold mb-3 line-clamp-3">{post.title}</h3>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      {post.views} views • {post.timeAgo}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant={post.liked ? "default" : "outline"}
-                        onClick={() => handlePostAction(post.id, "like")}
-                        className="flex-1"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={post.saved ? "default" : "outline"}
-                        onClick={() => handlePostAction(post.id, "save")}
-                        className="flex-1"
-                      >
-                        <Bookmark className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={post.commented ? "default" : "outline"}
-                        onClick={() => handlePostAction(post.id, "comment")}
-                        className="flex-1"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
                 </Card>
               );
             })}
