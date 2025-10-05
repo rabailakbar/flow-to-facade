@@ -56,7 +56,7 @@ const Exercise = () => {
           <h1 className="text-5xl font-bold mb-8">Module 1: Complete</h1>
           <Button 
             size="lg"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/module?id=M2&name=Let's blow bubbles&phase=Phase ii")}
             className="px-8"
           >
             Next Module →
