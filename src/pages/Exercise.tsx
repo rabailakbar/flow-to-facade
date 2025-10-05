@@ -140,7 +140,21 @@ const Exercise = () => {
     { id: 9, category: "Lifestyle", title: "Fashion & Trends", voted: null },
   ]);
 
-  // Module 2 state
+  // Module 2 state - Static grid items
+  const gridItems = [
+    { id: 1, fileName: "IG Post_1c.png", width: 226, height: 261 },
+    { id: 2, fileName: "IGR_3c.png", width: 226, height: 406 },
+    { id: 3, fileName: "YT Headline_ 8b.png", width: 494, height: 135 },
+    { id: 4, fileName: "YouTube Thumbnail_ 4a.png", width: 494, height: 258 },
+    { id: 5, fileName: "IG_9c.png", width: 234, height: 258 },
+    { id: 6, fileName: "IG_10a.png", width: 234, height: 258 },
+    { id: 7, fileName: "YouTube Thumbnail_ 1a.png", width: 494, height: 258 }, // Using 1a as 6b doesn't exist
+    { id: 8, fileName: "IG_8d.png", width: 494, height: 258 }, // Using 8d as 7a doesn't exist
+    { id: 9, fileName: "YTH_R.png", width: 494, height: 135 },
+    { id: 10, fileName: "IGR_8e.png", width: 226, height: 406 },
+    { id: 11, fileName: "IG_4c.png", width: 226, height: 261 },
+  ];
+
   const [posts, setPosts] = useState<Post[]>([]);
 
   const selectedCount = topics.filter(t => t.voted === "interested").length;
@@ -250,15 +264,113 @@ const Exercise = () => {
           {/* Instructions */}
           <h2 className="text-xl mb-8">Click to like, save & comment</h2>
 
-          {/* Posts Masonry Grid */}
+          {/* Custom Grid Layout */}
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '19px',
-              gridAutoFlow: 'dense'
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '20px',
+              gridAutoRows: 'min-content'
             }}
           >
+            {/* Shape 1 */}
+            <div style={{ width: '226px', height: '261px', gridColumn: '1', gridRow: '1' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[0].fileName}`}
+                alt="Shape 1"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 2 */}
+            <div style={{ width: '226px', height: '406px', gridColumn: '1', gridRow: '2 / 4' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[1].fileName}`}
+                alt="Shape 2"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 3 */}
+            <div style={{ width: '494px', height: '135px', gridColumn: '2 / 3', gridRow: '1' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
+                alt="Shape 3"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 4 */}
+            <div style={{ width: '494px', height: '258px', gridColumn: '2 / 3', gridRow: '2' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
+                alt="Shape 4"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 5 */}
+            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
+                alt="Shape 5"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 6 */}
+            <div style={{ width: '234px', height: '258px', gridColumn: '2', gridRow: '3', marginLeft: '254px' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
+                alt="Shape 6"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 7 */}
+            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '1' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[6].fileName}`}
+                alt="Shape 7"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 8 */}
+            <div style={{ width: '494px', height: '258px', gridColumn: '3', gridRow: '2' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[7].fileName}`}
+                alt="Shape 8"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 9 */}
+            <div style={{ width: '494px', height: '135px', gridColumn: '3', gridRow: '3' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[8].fileName}`}
+                alt="Shape 9"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 10 */}
+            <div style={{ width: '226px', height: '406px', gridColumn: '4', gridRow: '1 / 3' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[9].fileName}`}
+                alt="Shape 10"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
+
+            {/* Shape 11 */}
+            <div style={{ width: '226px', height: '261px', gridColumn: '4', gridRow: '3' }}>
+              <img 
+                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[10].fileName}`}
+                alt="Shape 11"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+              />
+            </div>
           </div>
         </div>
       </div>
