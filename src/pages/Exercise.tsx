@@ -62,7 +62,7 @@ const Exercise = () => {
   const likesCount = posts.filter(p => p.liked).length;
   const savesCount = posts.filter(p => p.saved).length;
   const commentsCount = posts.filter(p => p.commented).length;
-  const polarizationScore = Math.round((likesCount / 10) * 100);
+  const polarizationScore = Math.round((likesCount / 15) * 100);
 
   const handleVote = (id: number, vote: "interested" | "not-interested") => {
     setTopics(prev => {
@@ -90,9 +90,8 @@ const Exercise = () => {
       
       const newLikes = updated.filter(p => p.liked).length;
       const newSaves = updated.filter(p => p.saved).length;
-      const newComments = updated.filter(p => p.commented).length;
       
-      if (newLikes >= 10 && newSaves >= 10 && newComments >= 5) {
+      if (newLikes >= 15 && newSaves >= 10) {
         setTimeout(() => setIsComplete(true), 500);
       }
       
@@ -157,12 +156,9 @@ const Exercise = () => {
           </div>
 
           {/* Stats */}
-          <div className="flex justify-end gap-4 mb-6 text-lg">
-            <span>{likesCount}/10 Likes</span>
-            <span>|</span>
+          <div className="flex justify-end gap-3 mb-6 text-base">
+            <span>{likesCount}/15 Likes</span>
             <span>{savesCount}/10 Saves</span>
-            <span>|</span>
-            <span>{commentsCount}/5 Comments</span>
             <span className="text-muted-foreground">Left only</span>
           </div>
 
