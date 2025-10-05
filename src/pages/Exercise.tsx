@@ -292,7 +292,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 3 */}
-            <div style={{ width: '493px', height: '130px', gridColumn: '3 ', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '493px', height: '130px', gridColumn: '2 ', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
                 alt="Shape 3"
