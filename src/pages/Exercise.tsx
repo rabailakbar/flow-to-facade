@@ -102,7 +102,9 @@ const Exercise = () => {
           };
         });
         
-        setPosts(mappedPosts);
+        // Shuffle the posts for Pinterest-style mixed layout
+        const shuffled = mappedPosts.sort(() => Math.random() - 0.5);
+        setPosts(shuffled);
       }
     };
 
@@ -236,28 +238,33 @@ const Exercise = () => {
 
           {/* Posts Masonry Grid */}
           <div 
-            className="grid"
             style={{
+              display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, 226px)',
               gap: '19px',
-              justifyContent: 'start'
+              gridAutoFlow: 'dense'
             }}
           >
             {posts.map((post) => (
               <div
                 key={post.id}
                 style={{
-                  width: `${post.width}px`,
+                  width: post.width === 494 ? '494px' : '226px',
                   height: `${post.displayHeight}px`,
                   gridColumn: post.width === 494 ? 'span 2' : 'span 1'
                 }}
-                className="overflow-hidden rounded-lg"
+                className="overflow-hidden rounded-lg flex-shrink-0"
               >
                 {post.imageUrl && (
                   <img 
                     src={post.imageUrl} 
                     alt={post.title}
-                    className="w-full h-full object-cover"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
                   />
                 )}
               </div>
