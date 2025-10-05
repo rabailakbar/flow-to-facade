@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Code, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import supabase  from "@/utils/supabase";
@@ -55,7 +56,7 @@ console.log("Files:", data);
       </div>
 
       {/* Welcome Section */}
-      <Card className="p-6 mb-8">
+      <Card className="p-6 mb-8 relative">
         <div className="flex gap-6">
           <div className="w-24 h-24 bg-muted rounded-md flex-shrink-0" />
           <div className="flex-1">
@@ -65,6 +66,9 @@ console.log("Files:", data);
             </p>
           </div>
         </div>
+        <Button className="absolute bottom-4 right-4">
+          Click here to start
+        </Button>
       </Card>
 
       {/* Phases Section */}
