@@ -268,7 +268,7 @@ const Exercise = () => {
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: '226px 493px 494px 228px',
+              gridTemplateColumns: '226px 496px 494px 228px',
               gap: '19px',
               gridAutoRows: 'min-content',
               maxWidth: 'fit-content',
@@ -294,7 +294,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 3 */}
-            <div style={{ width: '493px', height: '130px', gridColumn: '2', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '496px', height: '130px', gridColumn: '2', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
                 alt="Shape 3"
@@ -303,7 +303,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 4 */}
-            <div style={{ width: '493px', height: '248px', gridColumn: '2', gridRow: '2', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '496px', height: '248px', gridColumn: '2', gridRow: '2', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
                 alt="Shape 4"
@@ -323,7 +323,7 @@ const Exercise = () => {
               </div>
 
               {/* Shape 6 */}
-              <div style={{ width: '248px', height: '399px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+              <div style={{ width: '251px', height: '399px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
                 <img 
                   src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
                   alt="Shape 6"
