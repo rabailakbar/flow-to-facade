@@ -268,9 +268,11 @@ const Exercise = () => {
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: '226px 493px 494px 228px',
               gap: '19px',
-              gridAutoRows: 'min-content'
+              gridAutoRows: 'min-content',
+              maxWidth: 'fit-content',
+              margin: '0 auto'
             }}
           >
             {/* Shape 1 */}
@@ -292,7 +294,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 3 */}
-            <div style={{ width: '493px', height: '130px', gridColumn: '2 / 3', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '493px', height: '130px', gridColumn: '2', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
                 alt="Shape 3"
@@ -301,7 +303,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 4 */}
-            <div style={{ width: '496px', height: '248px', gridColumn: '2 / 3', gridRow: '2', marginTop: '-10px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '493px', height: '248px', gridColumn: '2', gridRow: '2', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
                 alt="Shape 4"
@@ -309,22 +311,25 @@ const Exercise = () => {
               />
             </div>
 
-            {/* Shape 5 */}
-            <div style={{ width: '226px', height: '356px', gridColumn: '2', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
-                alt="Shape 5"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
+            {/* Shape 5 & 6 Container */}
+            <div style={{ gridColumn: '2', gridRow: '3', display: 'flex', gap: '19px' }}>
+              {/* Shape 5 */}
+              <div style={{ width: '226px', height: '356px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+                <img 
+                  src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
+                  alt="Shape 5"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
 
-            {/* Shape 6 */}
-            <div style={{ width: '251px', height: '399px', gridColumn: '2', gridRow: '3', marginLeft: '254px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
-                alt="Shape 6"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
+              {/* Shape 6 */}
+              <div style={{ width: '248px', height: '399px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+                <img 
+                  src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
+                  alt="Shape 6"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
             </div>
 
             {/* Shape 7 */}
