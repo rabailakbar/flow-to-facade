@@ -357,7 +357,7 @@ const Exercise = () => {
                   
                   {/* Overlay with buttons */}
                   <div 
-                    className="absolute bottom-0 left-0 right-0 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3 px-2"
+                    className="absolute bottom-2.5 left-0 right-0 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3 px-2"
                   >
                     <button
                       onClick={() => handlePostAction(item.id, 'like')}
