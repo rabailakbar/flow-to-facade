@@ -24,6 +24,7 @@ interface Post {
   commented: boolean;
   height: "short" | "medium" | "tall";
   imageUrl?: string;
+  imageHeight?: number;
 }
 
 const Exercise = () => {
@@ -50,18 +51,41 @@ const Exercise = () => {
       }
 
       if (data && data.length > 0) {
-        const imageUrls = data.map(file => {
+        // Get public URLs for all images
+        const imageData = data.map(file => {
           const { data: urlData } = supabase.storage
             .from('Thesis')
             .getPublicUrl(`Modules/${file.name}`);
           return urlData.publicUrl;
         });
 
-        // Update posts with actual image URLs
-        setPosts(prev => prev.map((post, index) => ({
-          ...post,
-          imageUrl: imageUrls[index % imageUrls.length] // Cycle through available images
-        })));
+        // Load images to get their dimensions
+        const loadImageDimensions = (url: string): Promise<{ url: string; height: number }> => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              // Calculate height based on aspect ratio (width will be constrained by column)
+              // Assuming column width is around 300px, calculate proportional height
+              const aspectRatio = img.height / img.width;
+              const estimatedHeight = Math.round(aspectRatio * 300);
+              resolve({ url, height: estimatedHeight });
+            };
+            img.onerror = () => {
+              // Default to medium height if image fails to load
+              resolve({ url, height: 250 });
+            };
+            img.src = url;
+          });
+        };
+
+        // Load all images and get their dimensions
+        Promise.all(imageData.map(loadImageDimensions)).then(imageDimensions => {
+          setPosts(prev => prev.map((post, index) => ({
+            ...post,
+            imageUrl: imageDimensions[index % imageDimensions.length].url,
+            imageHeight: imageDimensions[index % imageDimensions.length].height
+          })));
+        });
       }
     };
 
@@ -206,15 +230,13 @@ const Exercise = () => {
 
           {/* Posts Masonry Grid */}
           <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
-          {posts.map((post) => {
-              const heightClass = 
-                post.height === "short" ? "h-32" :
-                post.height === "medium" ? "h-64" :
-                "h-96";
-              
+          {posts.map((post) => {              
               return (
                 <Card key={post.id} className="mb-4 break-inside-avoid overflow-hidden">
-                  <div className={`${heightClass} bg-muted relative overflow-hidden`}>
+                  <div 
+                    className="bg-muted relative overflow-hidden"
+                    style={{ height: post.imageHeight ? `${post.imageHeight}px` : '250px' }}
+                  >
                     {post.imageUrl && (
                       <img 
                         src={post.imageUrl} 
