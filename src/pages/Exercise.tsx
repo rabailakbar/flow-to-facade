@@ -146,10 +146,10 @@ const Exercise = () => {
     { id: 2, fileName: "IGR_3c.png", width: 226, height: 406 },
     { id: 3, fileName: "YT Headline_ 8b.png", width: 494, height: 135 },
     { id: 4, fileName: "YouTube Thumbnail_ 4a.png", width: 494, height: 258 },
-    { id: 5, fileName: "IG_9c.png", width: 234, height: 258 },
+    { id: 5, fileName: "IG_9b.png", width: 234, height: 258 },
     { id: 6, fileName: "IG_10a.png", width: 234, height: 258 },
-    { id: 7, fileName: "YouTube Thumbnail_ 1a.png", width: 494, height: 258 }, // Using 1a as 6b doesn't exist
-    { id: 8, fileName: "IG_8d.png", width: 494, height: 258 }, // Using 8d as 7a doesn't exist
+    { id: 7, fileName: "YTT_6b.png", width: 494, height: 258 },
+    { id: 8, fileName: "YTT_7a.png", width: 494, height: 258 },
     { id: 9, fileName: "YTH_R.png", width: 494, height: 135 },
     { id: 10, fileName: "IGR_8e.png", width: 226, height: 406 },
     { id: 11, fileName: "IG_4c.png", width: 226, height: 261 },
