@@ -292,7 +292,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 3 */}
-            <div style={{ width: '493px', height: '130px', gridColumn: '2 ', gridRow: '1',marginBottom:'19px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '493px', height: '130px', gridColumn: '2 ', gridRow: '1',marginBottom:'10px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
                 alt="Shape 3"
@@ -301,7 +301,7 @@ const Exercise = () => {
             </div>
 
             {/* Shape 4 */}
-            <div style={{ width: '496px', height: '248px', gridColumn: '2 ', gridRow: '2', marginTop: '-240px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
+            <div style={{ width: '496px', height: '248px', gridColumn: '2 ', gridRow: '2', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
               <img 
                 src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
                 alt="Shape 4"
