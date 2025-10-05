@@ -13,8 +13,11 @@ interface Topic {
 
 const Exercise = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const moduleId = searchParams.get("id") || "M1";
   const moduleName = searchParams.get("name") || "Pick & Flick";
+  
+  const [isComplete, setIsComplete] = useState(false);
   
   const [topics, setTopics] = useState<Topic[]>([
     { id: 1, category: "Entertainment", title: "Celebrity Influence & Drama", voted: null },
@@ -31,12 +34,37 @@ const Exercise = () => {
   const selectedCount = topics.filter(t => t.voted === "interested").length;
 
   const handleVote = (id: number, vote: "interested" | "not-interested") => {
-    setTopics(prev => 
-      prev.map(topic => 
+    setTopics(prev => {
+      const updated = prev.map(topic => 
         topic.id === id ? { ...topic, voted: vote } : topic
-      )
-    );
+      );
+      const newCount = updated.filter(t => t.voted === "interested").length;
+      if (newCount >= 7) {
+        setTimeout(() => setIsComplete(true), 500);
+      }
+      return updated;
+    });
   };
+
+  if (isComplete) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center max-w-md mx-auto">
+          <Card className="p-16 mb-8 bg-muted">
+            <p className="text-2xl">Module Complete</p>
+          </Card>
+          <h1 className="text-5xl font-bold mb-8">Module 1: Complete</h1>
+          <Button 
+            size="lg"
+            onClick={() => navigate("/dashboard")}
+            className="px-8"
+          >
+            Next Module →
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-8">
