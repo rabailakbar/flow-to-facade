@@ -59,7 +59,7 @@ const Exercise = () => {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold">{selectedCount}/15</div>
+            <div className="text-4xl font-bold">{selectedCount}/7</div>
           </div>
         </div>
 
