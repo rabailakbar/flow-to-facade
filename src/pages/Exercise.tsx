@@ -52,59 +52,73 @@ const Exercise = () => {
       }
 
       if (data && data.length > 0) {
-        // Map images based on filename and type
-        const mappedPosts = data.map((file, index) => {
+        // Get public URLs for all images
+        const imagePromises = data.map(async (file, index) => {
           const { data: urlData } = supabase.storage
             .from('Thesis')
             .getPublicUrl(`Modules/${file.name}`);
           
-          const fileName = file.name.toLowerCase();
-          let type: "YTH" | "IG" | "YTT" | "IGR" | "TTR" = "IG";
-          let width = 226;
-          let height = 360;
-          
-          // Determine type and dimensions based on filename
-          if (fileName.includes('yth') || fileName.includes('yt headline')) {
-            type = "YTH";
-            width = 494;
-            height = 130;
-          } else if (fileName.includes('youtube thumbnail') || fileName.includes('ytt')) {
-            type = "YTT";
-            width = 494;
-            height = 297;
-          } else if (fileName.includes('igr')) {
-            type = "IGR";
-            width = 226;
-            height = 406;
-          } else if (fileName.includes('tt_') || fileName.includes('ttr')) {
-            type = "TTR";
-            width = 226;
-            height = 406;
-          } else if (fileName.includes('ig')) {
-            type = "IG";
-            width = 226;
-            height = 360;
-          }
-          
-          return {
-            id: index + 1,
-            title: file.name,
-            source: "",
-            views: "",
-            timeAgo: "",
-            liked: false,
-            saved: false,
-            commented: false,
-            imageUrl: urlData.publicUrl,
-            width,
-            displayHeight: height,
-            type
-          };
+          // Load image to get actual dimensions
+          return new Promise<Post>((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              const fileName = file.name.toLowerCase();
+              let type: "YTH" | "IG" | "YTT" | "IGR" | "TTR" = "IG";
+              
+              // Determine type based on filename
+              if (fileName.includes('yth') || fileName.includes('yt headline')) {
+                type = "YTH";
+              } else if (fileName.includes('youtube thumbnail') || fileName.includes('ytt')) {
+                type = "YTT";
+              } else if (fileName.includes('igr')) {
+                type = "IGR";
+              } else if (fileName.includes('tt_') || fileName.includes('ttr')) {
+                type = "TTR";
+              } else if (fileName.includes('ig')) {
+                type = "IG";
+              }
+              
+              resolve({
+                id: index + 1,
+                title: file.name,
+                source: "",
+                views: "",
+                timeAgo: "",
+                liked: false,
+                saved: false,
+                commented: false,
+                imageUrl: urlData.publicUrl,
+                width: img.naturalWidth,
+                displayHeight: img.naturalHeight,
+                type
+              });
+            };
+            img.onerror = () => {
+              resolve({
+                id: index + 1,
+                title: file.name,
+                source: "",
+                views: "",
+                timeAgo: "",
+                liked: false,
+                saved: false,
+                commented: false,
+                imageUrl: urlData.publicUrl,
+                width: 226,
+                displayHeight: 360,
+                type: "IG"
+              });
+            };
+            img.src = urlData.publicUrl;
+          });
         });
         
-        // Shuffle the posts for Pinterest-style mixed layout
-        const shuffled = mappedPosts.sort(() => Math.random() - 0.5);
-        setPosts(shuffled);
+        // Wait for all images to load and get their dimensions
+        Promise.all(imagePromises).then(loadedPosts => {
+          // Shuffle the posts for Pinterest-style mixed layout
+          const shuffled = loadedPosts.sort(() => Math.random() - 0.5);
+          setPosts(shuffled);
+        });
       }
     };
 
@@ -240,7 +254,7 @@ const Exercise = () => {
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, 226px)',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
               gap: '19px',
               gridAutoFlow: 'dense'
             }}
@@ -249,11 +263,10 @@ const Exercise = () => {
               <div
                 key={post.id}
                 style={{
-                  width: post.width === 494 ? '494px' : '226px',
-                  height: `${post.displayHeight}px`,
-                  gridColumn: post.width === 494 ? 'span 2' : 'span 1'
+                  width: `${post.width}px`,
+                  height: `${post.displayHeight}px`
                 }}
-                className="overflow-hidden rounded-lg flex-shrink-0"
+                className="overflow-hidden rounded-lg"
               >
                 {post.imageUrl && (
                   <img 
@@ -262,7 +275,7 @@ const Exercise = () => {
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
+                      objectFit: 'contain',
                       display: 'block'
                     }}
                   />
