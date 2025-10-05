@@ -178,23 +178,55 @@ const Exercise = () => {
 
   const handlePostAction = (id: number, action: "like" | "save" | "comment") => {
     setPosts(prev => {
-      const updated = prev.map(post => {
-        if (post.id === id) {
-          if (action === "like") return { ...post, liked: !post.liked };
-          if (action === "save") return { ...post, saved: !post.saved };
-          if (action === "comment") return { ...post, commented: true };
+      // Find if post exists
+      const existingPost = prev.find(p => p.id === id);
+      
+      if (existingPost) {
+        // Update existing post
+        const updated = prev.map(post => {
+          if (post.id === id) {
+            if (action === "like") return { ...post, liked: !post.liked };
+            if (action === "save") return { ...post, saved: !post.saved };
+            if (action === "comment") return { ...post, commented: true };
+          }
+          return post;
+        });
+        
+        const newLikes = updated.filter(p => p.liked).length;
+        const newSaves = updated.filter(p => p.saved).length;
+        
+        if (newLikes >= 15 && newSaves >= 10) {
+          setTimeout(() => setIsComplete(true), 500);
         }
-        return post;
-      });
-      
-      const newLikes = updated.filter(p => p.liked).length;
-      const newSaves = updated.filter(p => p.saved).length;
-      
-      if (newLikes >= 15 && newSaves >= 10) {
-        setTimeout(() => setIsComplete(true), 500);
+        
+        return updated;
+      } else {
+        // Create new post entry
+        const gridItem = gridItems.find(g => g.id === id);
+        const newPost: Post = {
+          id,
+          title: gridItem?.fileName || "",
+          source: "",
+          views: "",
+          timeAgo: "",
+          liked: action === "like",
+          saved: action === "save",
+          commented: action === "comment",
+          width: gridItem?.width || 226,
+          displayHeight: gridItem?.height || 360,
+          type: "IG"
+        };
+        
+        const updated = [...prev, newPost];
+        const newLikes = updated.filter(p => p.liked).length;
+        const newSaves = updated.filter(p => p.saved).length;
+        
+        if (newLikes >= 15 && newSaves >= 10) {
+          setTimeout(() => setIsComplete(true), 500);
+        }
+        
+        return updated;
       }
-      
-      return updated;
     });
   };
 
@@ -268,109 +300,85 @@ const Exercise = () => {
           <div 
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: '226px 496px 494px 228px',
               gap: '19px',
-              gridAutoRows: 'min-content'
+              gridAutoRows: 'min-content',
+              maxWidth: 'fit-content',
+              margin: '0 auto'
             }}
           >
-            {/* Shape 1 */}
-            <div style={{ width: '226px', height: '361px', gridColumn: '1', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[0].fileName}`}
-                alt="Shape 1"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
+            {gridItems.map((item, index) => {
+              const post = posts.find(p => p.id === item.id) || {
+                id: item.id,
+                liked: false,
+                saved: false,
+                title: item.fileName,
+                source: "",
+                views: "",
+                timeAgo: "",
+                commented: false,
+                width: item.width,
+                displayHeight: item.height,
+                type: "IG" as const
+              };
 
-            {/* Shape 2 */}
-            <div style={{ width: '224px', height: '402px', gridColumn: '1', gridRow: '2 / 4', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[1].fileName}`}
-                alt="Shape 2"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
+              const gridStyles: React.CSSProperties = {
+                width: `${item.width}px`,
+                height: `${item.height}px`,
+                borderRadius: '10px',
+                border: '0.5px solid #D9D9D9',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'pointer',
+                ...(index === 0 && { gridColumn: '1', gridRow: '1' }),
+                ...(index === 1 && { gridColumn: '1', gridRow: '2 / 4' }),
+                ...(index === 2 && { gridColumn: '2', gridRow: '1', marginBottom: '19px' }),
+                ...(index === 3 && { gridColumn: '2', gridRow: '2', marginTop: '-10px', marginBottom: '19px' }),
+                ...(index === 4 && { gridColumn: '2', gridRow: '3', marginTop: '-110px' }),
+                ...(index === 5 && { gridColumn: '2', gridRow: '3', marginLeft: '254px', marginTop: '-110px' }),
+                ...(index === 6 && { gridColumn: '3', gridRow: '1' }),
+                ...(index === 7 && { gridColumn: '3', gridRow: '2', marginTop: '-120px' }),
+                ...(index === 8 && { gridColumn: '3', gridRow: '3' }),
+                ...(index === 9 && { gridColumn: '4', gridRow: '1 / 3' }),
+                ...(index === 10 && { gridColumn: '4', gridRow: '3' }),
+              };
 
-            {/* Shape 3 */}
-            <div style={{ width: '493px', height: '130px', gridColumn: '2 ', gridRow: '1',marginBottom:'19px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[2].fileName}`}
-                alt="Shape 3"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 4 */}
-            <div style={{ width: '496px', height: '248px', gridColumn: '2 ', gridRow: '2', marginTop: '-230px', marginBottom: '19px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[3].fileName}`}
-                alt="Shape 4"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 5 */}
-            <div style={{ width: '226px', height: '356px', gridColumn: '2', gridRow: '3', borderRadius: '10px',marginTop: '-110px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[4].fileName}`}
-                alt="Shape 5"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 6 */}
-            <div style={{ width: '251px', height: '399px', gridColumn: '2', gridRow: '3', marginLeft: '254px',marginTop: '-110px', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[5].fileName}`}
-                alt="Shape 6"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 7 */}
-            <div style={{ width: '494px', height: '247px', gridColumn: '3', gridRow: '1', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[6].fileName}`}
-                alt="Shape 7"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 8 */}
-            <div style={{ width: '494px', height: '247px', gridColumn: '3', gridRow: '2',marginTop: '-120px' , borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[7].fileName}`}
-                alt="Shape 8"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 9 */}
-            <div style={{ width: '494px', height: '130px', gridColumn: '3', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[8].fileName}`}
-                alt="Shape 9"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 10 */}
-            <div style={{ width: '228px', height: '409px', gridColumn: '4', gridRow: '1 / 3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[9].fileName}`}
-                alt="Shape 10"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-
-            {/* Shape 11 */}
-            <div style={{ width: '227px', height: '363px', gridColumn: '4', gridRow: '3', borderRadius: '10px', border: '0.5px solid #D9D9D9', overflow: 'hidden' }}>
-              <img 
-                src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${gridItems[10].fileName}`}
-                alt="Shape 11"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
+              return (
+                <div
+                  key={item.id}
+                  className="group"
+                  style={gridStyles}
+                >
+                  <img 
+                    src={`https://wlneuhivxmpiasjmmryi.supabase.co/storage/v1/object/public/Thesis/Modules/${item.fileName}`}
+                    alt={`Post ${item.id}`}
+                    className="w-full h-full object-cover transition-all duration-200 group-hover:blur-[2px]"
+                  />
+                  
+                  {/* Overlay with buttons */}
+                  <div 
+                    className="absolute bottom-0 left-0 right-0 h-6 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3"
+                  >
+                    <button
+                      onClick={() => handlePostAction(item.id, 'like')}
+                      className="transition-colors duration-200 hover:scale-110"
+                    >
+                      <Heart 
+                        className={`w-4 h-4 ${post.liked ? 'fill-red-500 text-red-500' : 'text-foreground'}`}
+                      />
+                    </button>
+                    <button
+                      onClick={() => handlePostAction(item.id, 'save')}
+                      className="transition-colors duration-200 hover:scale-110"
+                    >
+                      <Bookmark 
+                        className={`w-4 h-4 ${post.saved ? 'fill-primary text-primary' : 'text-foreground'}`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
