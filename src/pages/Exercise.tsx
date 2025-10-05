@@ -48,14 +48,14 @@ const Exercise = () => {
   // Module 2 state
   const [posts, setPosts] = useState<Post[]>([
     { id: 1, title: "Blake Lively, Justin Baldoni and the collapse of Hollywood #MeToo Era", source: "dawn_images", views: "1.2K", timeAgo: "9 hours ago", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 2, title: "How many times can they be 'lucky guesses' before it's just the truth hiding in plain sight? #SimpsonsConspiracy", source: "EntertainMentWeekLY133", views: "1.5K", timeAgo: "1 day ago", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 3, title: "Bill Gates Knew It All Along? The Pandemic Prediction That Made Him Millions", source: "healthsafety67", views: "90.1M", timeAgo: "356 weeks ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 2, title: "How many times can they be 'lucky guesses' before it's just the truth hiding in plain sight? #SimpsonsConspiracy", source: "EntertainMentWeekLY133", views: "1.5K", timeAgo: "1 day ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 3, title: "Bill Gates Knew It All Along? The Pandemic Prediction That Made Him Millions", source: "healthsafety67", views: "90.1M", timeAgo: "356 weeks ago", liked: false, saved: false, commented: false, height: "medium" },
     { id: 4, title: "HERE'S A BREAKDOWN OF ALL PREDICTIONS MADE BY THE SIMPSONS FOR 2025", source: "Shobby Entertainment", views: "1.9M", timeAgo: "157K", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 5, title: "AI Just Stole Studio Ghibli's Soul?! Artists Furious Over ChatGPT Ghibli Trend", source: "Eazy Explained", views: "1M", timeAgo: "14 weeks ago", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 6, title: "Ryan Gosling speaks out after Oscars snub leaves Barbie f*cking furious", source: "dawn_images", views: "2.5K", timeAgo: "2 days ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 5, title: "AI Just Stole Studio Ghibli's Soul?! Artists Furious Over ChatGPT Ghibli Trend", source: "Eazy Explained", views: "1M", timeAgo: "14 weeks ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 6, title: "Ryan Gosling speaks out after Oscars snub leaves Barbie f*cking furious", source: "dawn_images", views: "2.5K", timeAgo: "2 days ago", liked: false, saved: false, commented: false, height: "medium" },
     { id: 7, title: "The black hole 'Gargantua' was so scientifically accurate, it took astrophysicists 100 hours for a single render. NASA Scientists even published research.", source: "abcnews", views: "856K", timeAgo: "5 days ago", liked: false, saved: false, commented: false, height: "tall" },
-    { id: 8, title: "BOMBSHELL: Mortician EXPOSES Charlie Kirk's Autopsy - The Key Evidence EVERYONE Missed!", source: "Beyond", views: "357K", timeAgo: "5 days ago", liked: false, saved: false, commented: false, height: "medium" },
-    { id: 9, title: "The AI Safety Expert: These are the only 5 Jobs that will remain in 2030! - Dr. Roman Yampolskiy", source: "The Diary of a CEO", views: "2.3M", timeAgo: "2 weeks ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 8, title: "BOMBSHELL: Mortician EXPOSES Charlie Kirk's Autopsy - The Key Evidence EVERYONE Missed!", source: "Beyond", views: "357K", timeAgo: "5 days ago", liked: false, saved: false, commented: false, height: "short" },
+    { id: 9, title: "The AI Safety Expert: These are the only 5 Jobs that will remain in 2030! - Dr. Roman Yampolskiy", source: "The Diary of a CEO", views: "2.3M", timeAgo: "2 weeks ago", liked: false, saved: false, commented: false, height: "medium" },
     { id: 10, title: "25 Best Ghibli Studio Images that are taking over the internet right now!", source: "ArtLeaks Online", views: "450K", timeAgo: "1 week ago", liked: false, saved: false, commented: false, height: "tall" },
   ]);
 
@@ -168,11 +168,11 @@ const Exercise = () => {
 
           {/* Posts Masonry Grid */}
           <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
-            {posts.map((post) => {
+          {posts.map((post) => {
               const heightClass = 
-                post.height === "short" ? "h-40" :
-                post.height === "medium" ? "h-56" :
-                "h-80";
+                post.height === "short" ? "h-32" :
+                post.height === "medium" ? "h-64" :
+                "h-96";
               
               return (
                 <Card key={post.id} className="mb-4 break-inside-avoid overflow-hidden">
