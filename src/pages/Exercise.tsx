@@ -129,7 +129,7 @@ const Exercise = () => {
   const polarizationScore = Math.round((likesCount / 15) * 100);
 
   useEffect(() => {
-    if (likesCount >= 15 && savesCount >= 10) {
+    if (likesCount >= 8 && savesCount >= 4) {
       setTimeout(() => setIsComplete(true), 500);
     }
   }, [likesCount, savesCount]);
@@ -175,8 +175,8 @@ const Exercise = () => {
         </div>
 
         <div className="flex justify-end gap-3 mb-6 text-base">
-          <span>{likesCount}/15 Likes</span>
-          <span>{savesCount}/10 Saves</span>
+          <span>{likesCount}/8 Likes</span>
+          <span>{savesCount}/4 Saves</span>
           <span className="text-muted-foreground">Left only</span>
         </div>
 
