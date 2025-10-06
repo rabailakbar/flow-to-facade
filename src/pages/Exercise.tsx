@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,12 +19,12 @@ interface Post {
 const Exercise = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const moduleId = searchParams.get("id") || "M1";
+  const moduleId = searchParams.get("id") || "M2";
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Fetch from Supabase
+  // Fetch images dynamically from Supabase
   useEffect(() => {
     const fetchImages = async () => {
       const { data, error } = await supabase.storage.from("Thesis").list("Modules", {
@@ -41,7 +39,6 @@ const Exercise = () => {
         data.map(async (file, index) => {
           const { data: urlData } = supabase.storage.from("Thesis").getPublicUrl(`Modules/${file.name}`);
 
-          // Load the image to get its dimensions
           return new Promise<Post>((resolve) => {
             const img = new Image();
             img.src = urlData.publicUrl;
@@ -70,6 +67,7 @@ const Exercise = () => {
         }),
       );
 
+      // Randomize order a bit
       setPosts(postsData.sort(() => Math.random() - 0.5));
     };
 
@@ -151,37 +149,45 @@ const Exercise = () => {
 
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
-        {/* Pinterest-style grid */}
-        <div
-          className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
-          style={{ columnGap: "1rem" }}
-        >
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
-            >
-              <img
-                src={post.imageUrl}
-                alt={post.title}
-                className="w-full rounded-xl transition-transform duration-200 group-hover:scale-105"
-              />
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <button
-                  onClick={() => handlePostAction(post.id, "like")}
-                  className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                >
-                  <Heart className={`w-5 h-5 ${post.liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
-                </button>
-                <button
-                  onClick={() => handlePostAction(post.id, "save")}
-                  className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                >
-                  <Bookmark className={`w-5 h-5 ${post.saved ? "fill-primary text-primary" : "text-foreground"}`} />
-                </button>
+        {/* ✅ Pinterest-style Grid (4 columns max) */}
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {posts.map((post) => {
+            // Detect very wide (thumbnail-like) images
+            const aspectRatio = post.width / post.height;
+            const isWide = aspectRatio > 1.8;
+
+            return (
+              <div
+                key={post.id}
+                className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
+              >
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  style={{
+                    width: "100%",
+                    height: isWide ? "200px" : "auto", // minimum visual height for thumbnails
+                    objectFit: "cover",
+                  }}
+                  className="rounded-xl transition-transform duration-200 group-hover:scale-105"
+                />
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <button
+                    onClick={() => handlePostAction(post.id, "like")}
+                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                  >
+                    <Heart className={`w-5 h-5 ${post.liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                  </button>
+                  <button
+                    onClick={() => handlePostAction(post.id, "save")}
+                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                  >
+                    <Bookmark className={`w-5 h-5 ${post.saved ? "fill-primary text-primary" : "text-foreground"}`} />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
