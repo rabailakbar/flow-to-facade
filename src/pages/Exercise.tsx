@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +26,7 @@ const Exercise = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Fetch images dynamically from Supabase
+  // 🔹 Fetch images dynamically from Supabase
   useEffect(() => {
     const fetchImages = async () => {
       const { data, error } = await supabase.storage.from("Thesis").list("Modules", {
@@ -67,13 +69,13 @@ const Exercise = () => {
         }),
       );
 
-      // Randomize order a bit
       setPosts(postsData.sort(() => Math.random() - 0.5));
     };
 
     fetchImages();
   }, []);
 
+  // 🔹 Handle Like / Save
   const handlePostAction = (id: number, action: "like" | "save") => {
     setPosts((prev) =>
       prev.map((p) =>
@@ -88,17 +90,19 @@ const Exercise = () => {
     );
   };
 
+  // 🔹 Calculate Progress
   const likesCount = posts.filter((p) => p.liked).length;
   const savesCount = posts.filter((p) => p.saved).length;
   const polarizationScore = Math.round((likesCount / 15) * 100);
 
-  // Completion check
+  // 🔹 Check Completion
   useEffect(() => {
     if (likesCount >= 15 && savesCount >= 10) {
       setTimeout(() => setIsComplete(true), 500);
     }
   }, [likesCount, savesCount]);
 
+  // 🔹 Completion Screen
   if (isComplete) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -115,6 +119,7 @@ const Exercise = () => {
     );
   }
 
+  // 🔹 Main Grid View
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
@@ -131,6 +136,7 @@ const Exercise = () => {
               </div>
             </div>
           </div>
+
           <div className="text-right">
             <Progress value={polarizationScore} className="w-64 h-3 mb-2" />
             <div className="flex justify-between items-center">
@@ -149,10 +155,9 @@ const Exercise = () => {
 
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
-        {/* ✅ Pinterest-style Grid (4 columns max) */}
+        {/* ✅ 4-column Masonry layout */}
         <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {posts.map((post) => {
-            // Detect very wide (thumbnail-like) images
             const aspectRatio = post.width / post.height;
             const isWide = aspectRatio > 1.8;
 
@@ -161,16 +166,21 @@ const Exercise = () => {
                 key={post.id}
                 className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
               >
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
+                {/* Smart Aspect Ratio Wrapper */}
+                <div
+                  className={`w-full overflow-hidden rounded-xl`}
                   style={{
-                    width: "100%",
-                    height: isWide ? "200px" : "auto", // minimum visual height for thumbnails
-                    objectFit: "cover",
+                    aspectRatio: isWide ? "16 / 9" : "auto",
                   }}
-                  className="rounded-xl transition-transform duration-200 group-hover:scale-105"
-                />
+                >
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="w-full h-auto object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* Action Buttons */}
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <button
                     onClick={() => handlePostAction(post.id, "like")}
