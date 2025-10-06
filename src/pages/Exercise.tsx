@@ -1,6 +1,9 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Clock, Heart, Bookmark } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,141 +11,306 @@ import { supabase } from "@/integrations/supabase/client";
 interface Post {
   id: number;
   title: string;
-  description: string;
-  image_url: string;
+  imageUrl: string;
+  width: number;
+  height: number;
+  code: string; // e.g. "1a"
+  codeNumber: string; // e.g. "1"
 }
 
-export default function Exercise() {
+const MAX_VISIBLE = 11;
+const MAX_LIKES = 6;
+const MAX_SAVES = 3;
+const TRANSITION_MS = 300;
+
+const Exercise = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const moduleId = searchParams.get("id") || "M1";
-  const [posts, setPosts] = useState<Post[]>([]);
+
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
-  const [liked, setLiked] = useState<Set<number>>(new Set());
-  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
+  const [isComplete, setIsComplete] = useState(false);
 
-  const MAX_VISIBLE = 11;
-  const MAX_LIKES = 6;
-  const MAX_SAVES = 3;
+  // animation helpers
+  const [animatingOutId, setAnimatingOutId] = useState<number | null>(null);
+  const [animatingInId, setAnimatingInId] = useState<number | null>(null);
 
+  // Fetch from Supabase and parse codes from filenames (code at very end like _1a.png)
   useEffect(() => {
-    const fetchPosts = async () => {
-      const { data, error } = await supabase.from("posts").select("*");
+    const fetchImages = async () => {
+      const { data, error } = await supabase.storage.from("Thesis").list("Modules", {
+        limit: 100,
+      });
       if (error) {
         console.error(error);
         return;
       }
-      setPosts(data || []);
-      setVisiblePosts((data || []).slice(0, MAX_VISIBLE));
+
+      const postsData: Post[] = await Promise.all(
+        data.map(async (file, index) => {
+          const { data: urlData } = supabase.storage.from("Thesis").getPublicUrl(`Modules/${file.name}`);
+
+          // extract code like 1a from filename suffix _1a.png (case-insensitive)
+          const match = file.name.match(/_(\d+[a-zA-Z])\.[^.]+$/i);
+          const code = match ? match[1].toLowerCase() : "";
+          const codeNumber = code.replace(/[^\d]/g, "");
+
+          // get dimensions (fallback if load fails)
+          const dim = await new Promise<{ w: number; h: number }>((resolve) => {
+            const img = new Image();
+            img.src = urlData.publicUrl;
+            img.onload = () => resolve({ w: img.width, h: img.height });
+            img.onerror = () => resolve({ w: 300, h: 300 });
+          });
+
+          return {
+            id: index + 1,
+            title: file.name,
+            imageUrl: urlData.publicUrl,
+            width: dim.w,
+            height: dim.h,
+            code,
+            codeNumber,
+          } as Post;
+        }),
+      );
+
+      const shuffled = postsData.sort(() => Math.random() - 0.5);
+      setAllPosts(shuffled);
+      setVisiblePosts(shuffled.slice(0, MAX_VISIBLE));
     };
 
-    fetchPosts();
+    fetchImages();
   }, []);
 
-  const extractCode = (filename: string) => {
-    const match = filename.match(/_(\d+[a-zA-Z])\.png$/);
-    return match ? match[1] : null;
+  // helpers to pick replacement
+  const pickRandom = (arr: Post[]) => arr[Math.floor(Math.random() * arr.length)];
+
+  const findReplacementFor = (current: Post) => {
+    if (!current) return null;
+
+    // candidates with same numeric prefix (e.g. '1')
+    const sameNumberCandidates = allPosts.filter(
+      (p) =>
+        p.codeNumber === current.codeNumber &&
+        p.id !== current.id &&
+        !visiblePosts.some((v) => v.id === p.id) &&
+        !likedIds.has(p.id) &&
+        !savedIds.has(p.id),
+    );
+
+    if (sameNumberCandidates.length > 0) return pickRandom(sameNumberCandidates);
+
+    // fallback: any unseen (not visible, not liked/saved)
+    const unseenOverall = allPosts.filter(
+      (p) =>
+        p.id !== current.id && !visiblePosts.some((v) => v.id === p.id) && !likedIds.has(p.id) && !savedIds.has(p.id),
+    );
+
+    if (unseenOverall.length > 0) return pickRandom(unseenOverall);
+
+    return null;
   };
 
-  const getPrefix = (code: string) => code.replace(/[^\d]/g, "");
+  // handle like/save action: toggle when already liked/saved; otherwise add and replace instantly (with animation)
+  const handlePostAction = (id: number, action: "like" | "save") => {
+    const current = visiblePosts.find((p) => p.id === id);
+    if (!current) return;
 
-  const findReplacement = (currentPost: Post) => {
-    const currentCode = extractCode(currentPost.image_url);
-    if (!currentCode) return null;
-    const prefix = getPrefix(currentCode);
+    if (action === "like") {
+      // If already liked -> unlike (no replacement)
+      if (likedIds.has(id)) {
+        setLikedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        return;
+      }
 
-    const unseen = posts.filter((p) => {
-      const code = extractCode(p.image_url);
-      if (!code) return false;
-      const samePrefix = code.startsWith(prefix);
-      const notUsed = !visiblePosts.some((v) => v.id === p.id) && !liked.has(p.id) && !saved.has(p.id);
-      return samePrefix && notUsed;
-    });
+      // Limit guard
+      if (likedIds.size >= MAX_LIKES) {
+        // reached max likes, ignore further likes
+        return;
+      }
 
-    if (unseen.length === 0) return null;
-    return unseen[Math.floor(Math.random() * unseen.length)];
-  };
+      // Add to liked set immediately so UI updates
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
 
-  const replacePost = (id: number) => {
-    const index = visiblePosts.findIndex((p) => p.id === id);
-    if (index === -1) return;
+      // Attempt replacement
+      const replacement = findReplacementFor(current);
+      if (replacement) {
+        // trigger fade-out on the card
+        setAnimatingOutId(id);
+        setTimeout(() => {
+          // actually swap
+          setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
+          setAnimatingOutId(null);
 
-    const replacement = findReplacement(visiblePosts[index]);
-    if (!replacement) return;
-
-    const updated = [...visiblePosts];
-    updated[index] = replacement;
-
-    // Tailwind animation trigger
-    const card = document.getElementById(`card-${id}`);
-    if (card) {
-      card.classList.add("opacity-0", "scale-95", "transition", "duration-500");
-      setTimeout(() => {
-        setVisiblePosts(updated);
-      }, 400);
+          // animate in new item: start at invisible, then remove flag to transition to visible
+          setAnimatingInId(replacement.id);
+          // small tick so browser applies initial class then transitions
+          setTimeout(() => setAnimatingInId(null), 20);
+        }, TRANSITION_MS);
+      }
     } else {
-      setVisiblePosts(updated);
+      // save action
+      if (savedIds.has(id)) {
+        // unsave
+        setSavedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        return;
+      }
+
+      if (savedIds.size >= MAX_SAVES) {
+        return;
+      }
+
+      setSavedIds((prev) => {
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
+
+      const replacement = findReplacementFor(current);
+      if (replacement) {
+        setAnimatingOutId(id);
+        setTimeout(() => {
+          setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
+          setAnimatingOutId(null);
+          setAnimatingInId(replacement.id);
+          setTimeout(() => setAnimatingInId(null), 20);
+        }, TRANSITION_MS);
+      }
     }
   };
 
-  const handleLike = (id: number) => {
-    if (liked.has(id)) return;
-    if (liked.size >= MAX_LIKES) return;
-    setLiked((prev) => new Set(prev).add(id));
-    replacePost(id);
-  };
+  const likesCount = likedIds.size;
+  const savesCount = savedIds.size;
+  const polarizationScore = Math.max(0, Math.min(100, Math.round((likesCount / MAX_LIKES) * 100)));
 
-  const handleSave = (id: number) => {
-    if (saved.has(id)) return;
-    if (saved.size >= MAX_SAVES) return;
-    setSaved((prev) => new Set(prev).add(id));
-    replacePost(id);
-  };
+  // Completion check: when both thresholds met
+  useEffect(() => {
+    if (likesCount >= MAX_LIKES && savesCount >= MAX_SAVES) {
+      setTimeout(() => setIsComplete(true), 500);
+    }
+  }, [likesCount, savesCount]);
+
+  if (isComplete) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="text-center max-w-md mx-auto">
+          <Card className="p-16 mb-8 bg-muted">
+            <p className="text-2xl">Module Complete</p>
+          </Card>
+          <h1 className="text-5xl font-bold mb-8">{moduleId}: Complete</h1>
+          <Button size="lg" onClick={() => navigate(`/module?id=M3&name=Next Module&phase=Phase iii`)} className="px-8">
+            Next Module →
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {visiblePosts.map((post) => (
-        <Card
-          key={post.id}
-          id={`card-${post.id}`}
-          className="relative group transition-all duration-500 transform hover:scale-105 hover:shadow-lg overflow-hidden"
-        >
-          <img
-            src={post.image_url}
-            alt={post.title}
-            className="w-full h-64 object-cover transition-opacity duration-500"
-          />
-          <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleLike(post.id)}
-              className="bg-white/70 hover:bg-white rounded-full"
-            >
-              <Heart
-                className={`w-5 h-5 transition-colors duration-300 ${liked.has(post.id) ? "text-red-500 fill-red-500" : "text-gray-700"}`}
-              />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleSave(post.id)}
-              className="bg-white/70 hover:bg-white rounded-full"
-            >
-              <Bookmark
-                className={`w-5 h-5 transition-colors duration-300 ${saved.has(post.id) ? "text-yellow-500 fill-yellow-500" : "text-gray-700"}`}
-              />
-            </Button>
-          </div>
-          <div className="p-2">
-            <h3 className="font-semibold text-sm line-clamp-1">{post.title}</h3>
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Clock className="w-3 h-3" />
-              <span>{post.description}</span>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start gap-6">
+            <div className="text-6xl font-bold">{moduleId}</div>
+            <div>
+              <h1 className="text-5xl font-bold mb-2">myworld</h1>
+              <p className="text-2xl text-muted-foreground mb-3">We see you!</p>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock className="w-5 h-5" />
+                <span className="text-lg">05:00</span>
+              </div>
             </div>
           </div>
-        </Card>
-      ))}
+
+          <div className="text-right">
+            <Progress value={polarizationScore} className="w-64 h-3 mb-2" />
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Polarization Score</span>
+              <span className="text-2xl font-bold">{polarizationScore}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="flex justify-end gap-3 mb-6 text-base">
+          <span>
+            {likesCount}/{MAX_LIKES} Likes
+          </span>
+          <span>
+            {savesCount}/{MAX_SAVES} Saves
+          </span>
+          <span className="text-muted-foreground">Left only</span>
+        </div>
+
+        <h2 className="text-xl mb-8">Click to like & save</h2>
+
+        {/* Pinterest-style grid */}
+        <div
+          className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
+          style={{ columnGap: "1rem" }}
+        >
+          {visiblePosts.map((post) => {
+            // compute per-card animation classes
+            const isAnimatingOut = animatingOutId === post.id;
+            const isAnimatingIn = animatingInId === post.id;
+            const baseImgClasses = "w-full rounded-xl transition-all duration-300";
+            const imgStateClass = isAnimatingOut
+              ? "opacity-0 scale-95"
+              : isAnimatingIn
+                ? "opacity-0 scale-95"
+                : "opacity-100 scale-100";
+
+            return (
+              <div
+                key={post.id}
+                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border ${isAnimatingOut ? "pointer-events-none" : ""}`}
+              >
+                <img src={post.imageUrl} alt={post.title} className={`${baseImgClasses} ${imgStateClass}`} />
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <button
+                    onClick={() => handlePostAction(post.id, "like")}
+                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                    title={likedIds.has(post.id) ? "Unlike" : "Like"}
+                  >
+                    <Heart
+                      className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
+                    />
+                  </button>
+
+                  <button
+                    onClick={() => handlePostAction(post.id, "save")}
+                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                    title={savedIds.has(post.id) ? "Unsave" : "Save"}
+                  >
+                    <Bookmark
+                      className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-primary text-primary" : "text-foreground"}`}
+                    />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Exercise;
