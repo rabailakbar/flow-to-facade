@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -153,33 +155,32 @@ const Exercise = () => {
 
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
-        {/* ✅ Responsive 4-column grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* ✅ 4-column Masonry layout */}
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {posts.map((post) => {
             const aspectRatio = post.width / post.height;
-            const isWide = aspectRatio > 1.7;
+            const isWide = aspectRatio > 1.8;
 
             return (
-              <Card
+              <div
                 key={post.id}
-                className="relative group overflow-hidden rounded-xl border border-border shadow-sm transition-all duration-200 hover:shadow-md"
+                className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
               >
-                {/* Smart Aspect Ratio / Height fix */}
+                {/* Smart Aspect Ratio Wrapper */}
                 <div
-                  className="w-full overflow-hidden rounded-xl"
+                  className={`w-full overflow-hidden rounded-xl`}
                   style={{
-                    width: "100%",
-                    height: isWide ? "240px" : "auto", // fixes short YouTube-like images
+                    aspectRatio: isWide ? "16 / 9" : "auto",
                   }}
                 >
                   <img
                     src={post.imageUrl}
                     alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                    className="w-full h-auto object-cover transition-transform duration-200 group-hover:scale-105"
                   />
                 </div>
 
-                {/* Hover Action Buttons */}
+                {/* Action Buttons */}
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <button
                     onClick={() => handlePostAction(post.id, "like")}
@@ -194,7 +195,7 @@ const Exercise = () => {
                     <Bookmark className={`w-5 h-5 ${post.saved ? "fill-primary text-primary" : "text-foreground"}`} />
                   </button>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
