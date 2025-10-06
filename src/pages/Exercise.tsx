@@ -150,10 +150,7 @@ const Exercise = () => {
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
         {/* Pinterest-style grid */}
-        <div
-          className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
-          style={{ columnGap: "1rem" }}
-        >
+        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4" style={{ columnGap: "1rem" }}>
           {posts.map((post) => (
             <div
               key={post.id}
