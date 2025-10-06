@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,12 +18,17 @@ interface Post {
   height: number;
 }
 
+const MAX_DISPLAY = 11;
+
 const Exercise = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const moduleId = searchParams.get("id") || "M1";
 
   const [posts, setPosts] = useState<Post[]>([]);
+  const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const [isComplete, setIsComplete] = useState(false);
 
   // Fetch from Supabase
@@ -39,7 +46,6 @@ const Exercise = () => {
         data.map(async (file, index) => {
           const { data: urlData } = supabase.storage.from("Thesis").getPublicUrl(`Modules/${file.name}`);
 
-          // Load the image to get its dimensions
           return new Promise<Post>((resolve) => {
             const img = new Image();
             img.src = urlData.publicUrl;
@@ -68,31 +74,60 @@ const Exercise = () => {
         }),
       );
 
-      setPosts(postsData.sort(() => Math.random() - 0.5));
+      const shuffled = postsData.sort(() => Math.random() - 0.5);
+      setPosts(shuffled);
+      setVisiblePosts(shuffled.slice(0, MAX_DISPLAY));
     };
 
     fetchImages();
   }, []);
 
-  const handlePostAction = (id: number, action: "like" | "save") => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              liked: action === "like" ? !p.liked : p.liked,
-              saved: action === "save" ? !p.saved : p.saved,
-            }
-          : p,
-      ),
+  const getReplacementPost = (oldPost: Post) => {
+    const remaining = posts.filter(
+      (p) => !likedIds.has(p.id) && !savedIds.has(p.id) && !visiblePosts.some((vp) => vp.id === p.id),
     );
+
+    const codePrefix = oldPost.title.split(/[_-]/)[0];
+    const similar = remaining.find((p) => p.title.includes(codePrefix));
+    return similar || remaining[0] || null;
   };
 
-  const likesCount = posts.filter((p) => p.liked).length;
-  const savesCount = posts.filter((p) => p.saved).length;
+  const handlePostAction = (id: number, action: "like" | "save") => {
+    const oldPost = visiblePosts.find((p) => p.id === id);
+    if (!oldPost) return;
+
+    const newLikedIds = new Set(likedIds);
+    const newSavedIds = new Set(savedIds);
+
+    if (action === "like") newLikedIds.add(id);
+    if (action === "save") newSavedIds.add(id);
+
+    setLikedIds(newLikedIds);
+    setSavedIds(newSavedIds);
+
+    const replacement = getReplacementPost(oldPost);
+    if (!replacement) return;
+
+    // Apply fade out and fade in using Tailwind transitions
+    const updatedPosts = visiblePosts.map((p) => {
+      if (p.id === id) {
+        const fadeOutDiv = document.getElementById(`post-${p.id}`);
+        if (fadeOutDiv) {
+          fadeOutDiv.classList.add("opacity-0", "scale-95", "transition-all", "duration-300");
+          setTimeout(() => {
+            setVisiblePosts((prev) => prev.map((x) => (x.id === id ? replacement : x)));
+          }, 300);
+        }
+      }
+      return p;
+    });
+    setVisiblePosts(updatedPosts);
+  };
+
+  const likesCount = likedIds.size;
+  const savesCount = savedIds.size;
   const polarizationScore = Math.round((likesCount / 15) * 100);
 
-  // Completion check
   useEffect(() => {
     if (likesCount >= 15 && savesCount >= 10) {
       setTimeout(() => setIsComplete(true), 500);
@@ -118,7 +153,6 @@ const Exercise = () => {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div className="flex items-start gap-6">
             <div className="text-6xl font-bold">{moduleId}</div>
@@ -140,7 +174,6 @@ const Exercise = () => {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="flex justify-end gap-3 mb-6 text-base">
           <span>{likesCount}/15 Likes</span>
           <span>{savesCount}/10 Saves</span>
@@ -149,33 +182,37 @@ const Exercise = () => {
 
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
-        {/* Pinterest-style grid */}
         <div
           className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
           style={{ columnGap: "1rem" }}
         >
-          {posts.map((post) => (
+          {visiblePosts.map((post) => (
             <div
               key={post.id}
-              className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
+              id={`post-${post.id}`}
+              className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-300"
             >
               <img
                 src={post.imageUrl}
                 alt={post.title}
-                className="w-full rounded-xl transition-transform duration-200 group-hover:scale-105"
+                className="w-full rounded-xl transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
                 <button
                   onClick={() => handlePostAction(post.id, "like")}
                   className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
                 >
-                  <Heart className={`w-5 h-5 ${post.liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                  <Heart
+                    className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
+                  />
                 </button>
                 <button
                   onClick={() => handlePostAction(post.id, "save")}
                   className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
                 >
-                  <Bookmark className={`w-5 h-5 ${post.saved ? "fill-primary text-primary" : "text-foreground"}`} />
+                  <Bookmark
+                    className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-yellow-400 text-yellow-400" : "text-foreground"}`}
+                  />
                 </button>
               </div>
             </div>
