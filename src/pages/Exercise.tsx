@@ -1,10 +1,11 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Clock, Heart, Bookmark } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Post {
@@ -86,47 +87,41 @@ const Exercise = () => {
       (p) => !likedIds.has(p.id) && !savedIds.has(p.id) && !visiblePosts.some((vp) => vp.id === p.id),
     );
 
-    // Try to find a file with similar code pattern
     const codePrefix = oldPost.title.split(/[_-]/)[0];
     const similar = remaining.find((p) => p.title.includes(codePrefix));
     return similar || remaining[0] || null;
   };
 
   const handlePostAction = (id: number, action: "like" | "save") => {
-    setVisiblePosts((prev) => {
-      const updated = prev.map((p) => {
-        if (p.id === id) {
-          const updatedPost = { ...p };
-          if (action === "like") updatedPost.liked = !p.liked;
-          if (action === "save") updatedPost.saved = !p.saved;
-          return updatedPost;
+    const oldPost = visiblePosts.find((p) => p.id === id);
+    if (!oldPost) return;
+
+    const newLikedIds = new Set(likedIds);
+    const newSavedIds = new Set(savedIds);
+
+    if (action === "like") newLikedIds.add(id);
+    if (action === "save") newSavedIds.add(id);
+
+    setLikedIds(newLikedIds);
+    setSavedIds(newSavedIds);
+
+    const replacement = getReplacementPost(oldPost);
+    if (!replacement) return;
+
+    // Apply fade out and fade in using Tailwind transitions
+    const updatedPosts = visiblePosts.map((p) => {
+      if (p.id === id) {
+        const fadeOutDiv = document.getElementById(`post-${p.id}`);
+        if (fadeOutDiv) {
+          fadeOutDiv.classList.add("opacity-0", "scale-95", "transition-all", "duration-300");
+          setTimeout(() => {
+            setVisiblePosts((prev) => prev.map((x) => (x.id === id ? replacement : x)));
+          }, 300);
         }
-        return p;
-      });
-      return updated;
+      }
+      return p;
     });
-
-    setTimeout(() => {
-      setLikedIds((prev) => {
-        const newSet = new Set(prev);
-        if (action === "like") newSet.add(id);
-        return newSet;
-      });
-
-      setSavedIds((prev) => {
-        const newSet = new Set(prev);
-        if (action === "save") newSet.add(id);
-        return newSet;
-      });
-
-      const oldPost = visiblePosts.find((p) => p.id === id);
-      if (!oldPost) return;
-
-      const replacement = getReplacementPost(oldPost);
-      if (!replacement) return;
-
-      setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
-    }, 300);
+    setVisiblePosts(updatedPosts);
   };
 
   const likesCount = likedIds.size;
@@ -191,43 +186,37 @@ const Exercise = () => {
           className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
           style={{ columnGap: "1rem" }}
         >
-          <AnimatePresence>
-            {visiblePosts.map((post) => (
-              <motion.div
-                key={post.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.3 }}
-                className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
-              >
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
-                  className="w-full rounded-xl transition-transform duration-200 group-hover:scale-105"
-                />
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                  <button
-                    onClick={() => handlePostAction(post.id, "like")}
-                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
-                    />
-                  </button>
-                  <button
-                    onClick={() => handlePostAction(post.id, "save")}
-                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                  >
-                    <Bookmark
-                      className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-yellow-400 text-yellow-400" : "text-foreground"}`}
-                    />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {visiblePosts.map((post) => (
+            <div
+              key={post.id}
+              id={`post-${post.id}`}
+              className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-300"
+            >
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full rounded-xl transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <button
+                  onClick={() => handlePostAction(post.id, "like")}
+                  className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                >
+                  <Heart
+                    className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
+                  />
+                </button>
+                <button
+                  onClick={() => handlePostAction(post.id, "save")}
+                  className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                >
+                  <Bookmark
+                    className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-yellow-400 text-yellow-400" : "text-foreground"}`}
+                  />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
