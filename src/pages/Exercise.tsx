@@ -14,14 +14,18 @@ interface Post {
   saved: boolean;
   width: number;
   height: number;
+  code: string; // e.g. "1A"
 }
+
+const MAX_VISIBLE = 11;
 
 const Exercise = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const moduleId = searchParams.get("id") || "M1";
 
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [visiblePosts, setVisiblePosts] = useState<Post[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
   // Fetch from Supabase
@@ -38,8 +42,8 @@ const Exercise = () => {
       const postsData = await Promise.all(
         data.map(async (file, index) => {
           const { data: urlData } = supabase.storage.from("Thesis").getPublicUrl(`Modules/${file.name}`);
+          const code = file.name.split("_")[0]; // extract 1A, 2A etc.
 
-          // Load the image to get its dimensions
           return new Promise<Post>((resolve) => {
             const img = new Image();
             img.src = urlData.publicUrl;
@@ -52,6 +56,7 @@ const Exercise = () => {
                 saved: false,
                 width: img.width,
                 height: img.height,
+                code,
               });
             };
             img.onerror = () =>
@@ -63,33 +68,55 @@ const Exercise = () => {
                 saved: false,
                 width: 300,
                 height: 300,
+                code,
               });
           });
         }),
       );
 
-      setPosts(postsData.sort(() => Math.random() - 0.5));
+      const shuffled = postsData.sort(() => Math.random() - 0.5);
+      setAllPosts(shuffled);
+
+      // Show initial 11 images
+      setVisiblePosts(shuffled.slice(0, MAX_VISIBLE));
     };
 
     fetchImages();
   }, []);
 
   const handlePostAction = (id: number, action: "like" | "save") => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              liked: action === "like" ? !p.liked : p.liked,
-              saved: action === "save" ? !p.saved : p.saved,
-            }
-          : p,
-      ),
-    );
+    if (action === "like") {
+      setVisiblePosts((prevVisible) => {
+        const likedPost = prevVisible.find((p) => p.id === id);
+        if (!likedPost) return prevVisible;
+
+        // find next unused image with same code
+        const remainingInSameGroup = allPosts.filter(
+          (p) => p.code === likedPost.code && !prevVisible.some((v) => v.id === p.id),
+        );
+
+        const replacement = remainingInSameGroup[0];
+
+        if (replacement) {
+          // replace liked post with replacement
+          return prevVisible.map((p) =>
+            p.id === id
+              ? { ...replacement, liked: false, saved: false } // new image
+              : p,
+          );
+        } else {
+          // no replacement, just toggle like
+          return prevVisible.map((p) => (p.id === id ? { ...p, liked: !p.liked } : p));
+        }
+      });
+    } else {
+      // save toggle
+      setVisiblePosts((prev) => prev.map((p) => (p.id === id ? { ...p, saved: !p.saved } : p)));
+    }
   };
 
-  const likesCount = posts.filter((p) => p.liked).length;
-  const savesCount = posts.filter((p) => p.saved).length;
+  const likesCount = visiblePosts.filter((p) => p.liked).length;
+  const savesCount = visiblePosts.filter((p) => p.saved).length;
   const polarizationScore = Math.round((likesCount / 15) * 100);
 
   // Completion check
@@ -150,8 +177,11 @@ const Exercise = () => {
         <h2 className="text-xl mb-8">Click to like & save</h2>
 
         {/* Pinterest-style grid */}
-        <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4" style={{ columnGap: "1rem" }}>
-          {posts.map((post) => (
+        <div
+          className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4"
+          style={{ columnGap: "1rem" }}
+        >
+          {visiblePosts.map((post) => (
             <div
               key={post.id}
               className="relative break-inside-avoid group overflow-hidden rounded-xl border border-border"
