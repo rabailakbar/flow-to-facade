@@ -14,8 +14,8 @@ interface Post {
   imageUrl: string;
   width: number;
   height: number;
-  code: string; // e.g. "1a"
-  codeNumber: string; // e.g. "1"
+  code: string;
+  codeNumber: string;
 }
 
 const MAX_VISIBLE = 11;
@@ -34,11 +34,9 @@ const Exercise = () => {
   const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const [isComplete, setIsComplete] = useState(false);
 
-  // animation helpers
   const [animatingOutId, setAnimatingOutId] = useState<number | null>(null);
   const [animatingInId, setAnimatingInId] = useState<number | null>(null);
 
-  // Fetch from Supabase and parse codes from filenames (code at very end like _1a.png)
   useEffect(() => {
     const fetchImages = async () => {
       const { data, error } = await supabase.storage.from("Thesis").list("Modules", {
@@ -52,13 +50,10 @@ const Exercise = () => {
       const postsData: Post[] = await Promise.all(
         data.map(async (file, index) => {
           const { data: urlData } = supabase.storage.from("Thesis").getPublicUrl(`Modules/${file.name}`);
-
-          // extract code like 1a from filename suffix _1a.png (case-insensitive)
           const match = file.name.match(/_(\d+[a-zA-Z])\.[^.]+$/i);
           const code = match ? match[1].toLowerCase() : "";
           const codeNumber = code.replace(/[^\d]/g, "");
 
-          // get dimensions (fallback if load fails)
           const dim = await new Promise<{ w: number; h: number }>((resolve) => {
             const img = new Image();
             img.src = urlData.publicUrl;
@@ -86,13 +81,11 @@ const Exercise = () => {
     fetchImages();
   }, []);
 
-  // helpers to pick replacement
   const pickRandom = (arr: Post[]) => arr[Math.floor(Math.random() * arr.length)];
 
   const findReplacementFor = (current: Post) => {
     if (!current) return null;
 
-    // candidates with same numeric prefix (e.g. '1')
     const sameNumberCandidates = allPosts.filter(
       (p) =>
         p.codeNumber === current.codeNumber &&
@@ -104,7 +97,6 @@ const Exercise = () => {
 
     if (sameNumberCandidates.length > 0) return pickRandom(sameNumberCandidates);
 
-    // fallback: any unseen (not visible, not liked/saved)
     const unseenOverall = allPosts.filter(
       (p) =>
         p.id !== current.id && !visiblePosts.some((v) => v.id === p.id) && !likedIds.has(p.id) && !savedIds.has(p.id),
@@ -115,13 +107,11 @@ const Exercise = () => {
     return null;
   };
 
-  // handle like/save action: toggle when already liked/saved; otherwise add and replace instantly (with animation)
   const handlePostAction = (id: number, action: "like" | "save") => {
     const current = visiblePosts.find((p) => p.id === id);
     if (!current) return;
 
     if (action === "like") {
-      // If already liked -> unlike (no replacement)
       if (likedIds.has(id)) {
         setLikedIds((prev) => {
           const next = new Set(prev);
@@ -131,39 +121,26 @@ const Exercise = () => {
         return;
       }
 
-      // Limit guard
-      if (likedIds.size >= MAX_LIKES) {
-        // reached max likes, ignore further likes
-        return;
-      }
+      if (likedIds.size >= MAX_LIKES) return;
 
-      // Add to liked set immediately so UI updates
       setLikedIds((prev) => {
         const next = new Set(prev);
         next.add(id);
         return next;
       });
 
-      // Attempt replacement
       const replacement = findReplacementFor(current);
       if (replacement) {
-        // trigger fade-out on the card
         setAnimatingOutId(id);
         setTimeout(() => {
-          // actually swap
           setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
           setAnimatingOutId(null);
-
-          // animate in new item: start at invisible, then remove flag to transition to visible
           setAnimatingInId(replacement.id);
-          // small tick so browser applies initial class then transitions
-          setTimeout(() => setAnimatingInId(null), 20);
+          setTimeout(() => setAnimatingInId(null), 400);
         }, TRANSITION_MS);
       }
     } else {
-      // save action
       if (savedIds.has(id)) {
-        // unsave
         setSavedIds((prev) => {
           const next = new Set(prev);
           next.delete(id);
@@ -172,9 +149,7 @@ const Exercise = () => {
         return;
       }
 
-      if (savedIds.size >= MAX_SAVES) {
-        return;
-      }
+      if (savedIds.size >= MAX_SAVES) return;
 
       setSavedIds((prev) => {
         const next = new Set(prev);
@@ -189,7 +164,7 @@ const Exercise = () => {
           setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
           setAnimatingOutId(null);
           setAnimatingInId(replacement.id);
-          setTimeout(() => setAnimatingInId(null), 20);
+          setTimeout(() => setAnimatingInId(null), 400);
         }, TRANSITION_MS);
       }
     }
@@ -199,7 +174,6 @@ const Exercise = () => {
   const savesCount = savedIds.size;
   const polarizationScore = Math.max(0, Math.min(100, Math.round((likesCount / MAX_LIKES) * 100)));
 
-  // Completion check: when both thresholds met
   useEffect(() => {
     if (likesCount >= MAX_LIKES && savesCount >= MAX_SAVES) {
       setTimeout(() => setIsComplete(true), 500);
@@ -267,23 +241,23 @@ const Exercise = () => {
           style={{ columnGap: "1rem" }}
         >
           {visiblePosts.map((post) => {
-            // compute per-card animation classes
             const isAnimatingOut = animatingOutId === post.id;
             const isAnimatingIn = animatingInId === post.id;
-            const baseImgClasses = "w-full rounded-xl transition-all duration-300";
-            const imgStateClass = isAnimatingOut
-              ? "opacity-0 scale-95"
-              : isAnimatingIn
-                ? "opacity-0 scale-95"
-                : "opacity-100 scale-100";
 
             return (
               <div
                 key={post.id}
-                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border ${isAnimatingOut ? "pointer-events-none" : ""}`}
+                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-500 ease-in-out ${
+                  isAnimatingOut ? "opacity-0 scale-90" : isAnimatingIn ? "opacity-0 scale-90" : "opacity-100 scale-100"
+                }`}
               >
-                <img src={post.imageUrl} alt={post.title} className={`${baseImgClasses} ${imgStateClass}`} />
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className="w-full rounded-xl object-cover transition-all duration-700 ease-in-out"
+                />
+
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
                   <button
                     onClick={() => handlePostAction(post.id, "like")}
                     className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
