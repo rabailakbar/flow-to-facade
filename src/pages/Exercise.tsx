@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,8 +34,7 @@ const Exercise = () => {
   const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const [isComplete, setIsComplete] = useState(false);
 
-  const [animatingOutId, setAnimatingOutId] = useState<number | null>(null);
-  const [animatingInId, setAnimatingInId] = useState<number | null>(null);
+  const [replacingIds, setReplacingIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -109,62 +110,44 @@ const Exercise = () => {
     const current = visiblePosts.find((p) => p.id === id);
     if (!current) return;
 
-    if (action === "like") {
-      if (likedIds.has(id)) {
-        setLikedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-        return;
-      }
+    const isLike = action === "like";
+    const isSet = isLike ? likedIds.has(id) : savedIds.has(id);
+    const setState = isLike ? setLikedIds : setSavedIds;
+    const currentSet = isLike ? likedIds : savedIds;
+    const limit = isLike ? MAX_LIKES : MAX_SAVES;
 
-      if (likedIds.size >= MAX_LIKES) return;
-
-      setLikedIds((prev) => {
+    if (isSet) {
+      setState((prev) => {
         const next = new Set(prev);
-        next.add(id);
+        next.delete(id);
         return next;
       });
+      return;
+    }
 
-      const replacement = findReplacementFor(current);
-      if (replacement) {
-        setAnimatingOutId(id);
+    if (currentSet.size >= limit) return;
+
+    setState((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+
+    const replacement = findReplacementFor(current);
+    if (replacement) {
+      setReplacingIds((prev) => new Set(prev).add(id));
+
+      setTimeout(() => {
+        setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
+
         setTimeout(() => {
-          setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
-          setAnimatingOutId(null);
-          setAnimatingInId(replacement.id);
-          setTimeout(() => setAnimatingInId(null), 500);
+          setReplacingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
         }, TRANSITION_MS);
-      }
-    } else {
-      if (savedIds.has(id)) {
-        setSavedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-        return;
-      }
-
-      if (savedIds.size >= MAX_SAVES) return;
-
-      setSavedIds((prev) => {
-        const next = new Set(prev);
-        next.add(id);
-        return next;
-      });
-
-      const replacement = findReplacementFor(current);
-      if (replacement) {
-        setAnimatingOutId(id);
-        setTimeout(() => {
-          setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
-          setAnimatingOutId(null);
-          setAnimatingInId(replacement.id);
-          setTimeout(() => setAnimatingInId(null), 500);
-        }, TRANSITION_MS);
-      }
+      }, TRANSITION_MS);
     }
   };
 
@@ -195,7 +178,7 @@ const Exercise = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-background p-8 transition-all duration-500">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
@@ -239,46 +222,45 @@ const Exercise = () => {
           style={{ columnGap: "1rem" }}
         >
           {visiblePosts.map((post) => {
-            const isAnimatingOut = animatingOutId === post.id;
-            const isAnimatingIn = animatingInId === post.id;
+            const isReplacing = replacingIds.has(post.id);
 
             return (
               <div
                 key={post.id}
-                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                  isAnimatingOut
-                    ? "opacity-0 scale-95 translate-y-2"
-                    : isAnimatingIn
-                      ? "opacity-0 scale-95 -translate-y-2"
-                      : "opacity-100 scale-100 translate-y-0"
-                }`}
+                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}
               >
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
-                  className="w-full rounded-xl object-cover transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                />
+                <div
+                  className={`relative transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                    isReplacing ? "opacity-0 scale-95" : "opacity-100 scale-100"
+                  }`}
+                >
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="w-full rounded-xl object-cover transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  />
 
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
-                  <button
-                    onClick={() => handlePostAction(post.id, "like")}
-                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                    title={likedIds.has(post.id) ? "Unlike" : "Like"}
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
-                    />
-                  </button>
+                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
+                    <button
+                      onClick={() => handlePostAction(post.id, "like")}
+                      className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                      title={likedIds.has(post.id) ? "Unlike" : "Like"}
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${likedIds.has(post.id) ? "fill-red-500 text-red-500" : "text-foreground"}`}
+                      />
+                    </button>
 
-                  <button
-                    onClick={() => handlePostAction(post.id, "save")}
-                    className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
-                    title={savedIds.has(post.id) ? "Unsave" : "Save"}
-                  >
-                    <Bookmark
-                      className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-primary text-primary" : "text-foreground"}`}
-                    />
-                  </button>
+                    <button
+                      onClick={() => handlePostAction(post.id, "save")}
+                      className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
+                      title={savedIds.has(post.id) ? "Unsave" : "Save"}
+                    >
+                      <Bookmark
+                        className={`w-5 h-5 ${savedIds.has(post.id) ? "fill-primary text-primary" : "text-foreground"}`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
