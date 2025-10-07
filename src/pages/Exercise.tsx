@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +19,7 @@ interface Post {
 const MAX_VISIBLE = 11;
 const MAX_LIKES = 6;
 const MAX_SAVES = 3;
-const TRANSITION_MS = 300;
+const TRANSITION_MS = 350;
 
 const Exercise = () => {
   const [searchParams] = useSearchParams();
@@ -136,7 +134,7 @@ const Exercise = () => {
           setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
           setAnimatingOutId(null);
           setAnimatingInId(replacement.id);
-          setTimeout(() => setAnimatingInId(null), 400);
+          setTimeout(() => setAnimatingInId(null), 500);
         }, TRANSITION_MS);
       }
     } else {
@@ -164,7 +162,7 @@ const Exercise = () => {
           setVisiblePosts((prev) => prev.map((p) => (p.id === id ? replacement : p)));
           setAnimatingOutId(null);
           setAnimatingInId(replacement.id);
-          setTimeout(() => setAnimatingInId(null), 400);
+          setTimeout(() => setAnimatingInId(null), 500);
         }, TRANSITION_MS);
       }
     }
@@ -247,17 +245,21 @@ const Exercise = () => {
             return (
               <div
                 key={post.id}
-                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-500 ease-in-out ${
-                  isAnimatingOut ? "opacity-0 scale-90" : isAnimatingIn ? "opacity-0 scale-90" : "opacity-100 scale-100"
+                className={`relative break-inside-avoid group overflow-hidden rounded-xl border border-border transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                  isAnimatingOut
+                    ? "opacity-0 scale-95 translate-y-2"
+                    : isAnimatingIn
+                      ? "opacity-0 scale-95 -translate-y-2"
+                      : "opacity-100 scale-100 translate-y-0"
                 }`}
               >
                 <img
                   src={post.imageUrl}
                   alt={post.title}
-                  className="w-full rounded-xl object-cover transition-all duration-700 ease-in-out"
+                  className="w-full rounded-xl object-cover transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
                 />
 
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
                   <button
                     onClick={() => handlePostAction(post.id, "like")}
                     className="flex items-center justify-center bg-background/80 backdrop-blur-sm border border-border rounded-full px-6 py-1 hover:scale-105 transition-all"
